@@ -89,7 +89,9 @@ export default function CoursesPage() {
       }
     } else {
       toast.error("فشل تسجيلك في الدورة.")
+
     }
+    
     setLoad(false);
   }
   return (

@@ -19,6 +19,7 @@ export async function POST(req: Request) {
     });
 
     if (!course) {
+      console.log("❌ Course not found:", courseId);
       return NextResponse.json(
         { success: false, message: "Course not found." },
         { status: 404 }
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
     // ✅ Check if user already enrolled (fixed)
     const alreadyBought = await prisma.course.findFirst({
       where: {
+        id: Number(courseId),
         Users: {
           some: {
             email: email,
@@ -40,6 +42,7 @@ export async function POST(req: Request) {
     });
 
     if (alreadyBought) {
+      console.log("❌ User already enrolled:", email);
       return NextResponse.json({
         success: false,
         message: "User already enrolled in this course.",
