@@ -17,7 +17,7 @@ export default clerkMiddleware(async(auth,req)=>{
   const adminToken = req.cookies.get("adminToken")?.value;
 
   if (!adminToken) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   try {
@@ -25,7 +25,7 @@ export default clerkMiddleware(async(auth,req)=>{
     return NextResponse.next();
   } catch(error) {
     console.error("JWT verification failed:", error);
-    return NextResponse.json({ message: "Invalid admin token", error }, { status: 401 });
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 }
   

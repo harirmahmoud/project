@@ -5,7 +5,7 @@ export default function SignInPage() {
   return (
     <div className="flex justify-center items-center h-[100vh]">
       <SignIn
-      redirectUrl="/main"/>
+      redirectUrl="/"/>
       {/* Sign up form goes here */}
     </div>
   )
