@@ -17,7 +17,7 @@ export async function GET() {
       where: { isRead: false },
     })
 
-    const totalRevenue = coursesWithUsers.reduce((acc, course) => {
+    const totalRevenue = coursesWithUsers.reduce((acc: number, course: { price: number; Users: string | any[]; }) => {
       return acc + course.price * course.Users.length;
     }, 0);
 
