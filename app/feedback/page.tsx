@@ -43,7 +43,7 @@ export default function FeedbackPage() {
     setError("")
 
     try {
-      const response = await fetch("/api/feedback", {
+      const response = await fetch("/api/notification/sendfeedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
