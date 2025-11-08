@@ -1,5 +1,6 @@
 // API Response Types
 export interface ApiResponse<T> {
+  isBuyedCoursesIds: never[]
   data?: T
   courses?: T[]
   blogs?: T[]

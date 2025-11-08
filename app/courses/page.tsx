@@ -6,10 +6,12 @@ import type { Course, ApiResponse } from "@/lib/type" // Assuming these types ar
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"// Assuming these components are declared somewhere
-import { Search, ChevronRight, ChevronLeft } from "lucide-react" // Assuming these icons are declared somewhere
+import { Search, ChevronRight, ChevronLeft, Loader2 } from "lucide-react" // Assuming these icons are declared somewhere
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import Chatbot from "@/components/chatbot"// Assuming Chatbot component is declared somewhere
+import { useUser } from "@clerk/nextjs"
+import { toast } from "react-toastify"
 
 const categories = ["الكل", "مبتدئ", "متوسط", "متقدم"] // Assuming categories are defined somewhere
 
@@ -20,6 +22,10 @@ export default function CoursesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [isBuy, setIsBuy] = useState<number[]>([])
+  const [load,setLoad]=useState(false)
+  
+  const user = useUser()
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -31,10 +37,19 @@ export default function CoursesPage() {
           search: searchQuery,
           level: selectedCategory,
         })
-        const response = await fetch(`/api/courses?${params}`)
+        const response = await fetch(`/api/courses?${params}`, {
+          method: "POST",
+          body: JSON.stringify({ userId: user.user?.id }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
         const data: ApiResponse<Course> = await response.json()
         setCourses(data.courses || [])
         setTotalPages(data.totalPages || 1)
+        setIsBuy(data.isBuyedCoursesIds || [])
+        console.log("✅ Fetched courses:", data.isBuyedCoursesIds)
+       
       } catch (error) {
         console.error("Failed to fetch courses:", error)
       } finally {
@@ -45,6 +60,38 @@ export default function CoursesPage() {
     fetchCourses()
   }, [currentPage, searchQuery, selectedCategory])
 
+  const handleBuy = async (id: number) => {
+    setLoad(true);
+    // Implement the buy logic here
+    const response = await fetch(`/api/courses/buyCourse`, {
+      method: "POST",
+      body: JSON.stringify({ email: user.user?.emailAddresses[0].emailAddress, courseId: id }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    const data = await response.json()
+    if (data.success) {
+      toast.success("تم تسجيلك في الدورة بنجاح!")
+      setIsBuy((prev) => [...prev, id])
+      const notification = await fetch(`/api/notification`, {
+        method: "POST",
+        body: JSON.stringify({ email: user.user?.emailAddresses[0].emailAddress, message: `لقد تم تسجيلك في دورة جديدة: ${data.courseTitle}` }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      const notificationData = await notification.json()
+      if (notificationData.success) {
+        toast.success("تم إرسال إشعار التسجيل بنجاح!")
+      } else {
+        toast.error("فشل إرسال إشعار التسجيل.")
+      }
+    } else {
+      toast.error("فشل تسجيلك في الدورة.")
+    }
+    setLoad(false);
+  }
   return (
     <main className="min-h-screen bg-background">
       <Header />
@@ -132,11 +179,15 @@ export default function CoursesPage() {
                       <p className="text-muted-foreground mb-4 line-clamp-2 flex-grow">{course.description}</p>
                       <div className="flex items-center justify-between mb-4 pt-4 border-t border-border">
                         <span className="font-bold text-primary">
-                          {course.price === 0 ? "مجاني" : `${course.price} ريال`}
+                          {course.price === 0 ? "مجاني" : `${course.price} DA`}
                         </span>
                       </div>
-                      <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                        سجل الآن
+                      <Button onClick={()=>{isBuy.includes(course.id) ? null : handleBuy(course.id)}} className={isBuy.includes(course.id) ?"w-full bg-primary hover:bg-primary/90 text-primary-foreground":"w-full"} disabled={isBuy.includes(course.id)}>
+                        {load ?(
+                          <Loader2 className="w-4 h-4 animate-spin text-black" />
+                        ) : (
+                          isBuy.includes(course.id) ? "مسجل بالفعل" : "سجل الآن"
+                        )}
                       </Button>
                     </div>
                   </Card>

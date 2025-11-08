@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 
-export async function GET(req: Request) {
+export async function POST(req: Request) {
   try {
+    const { id: userId } = await req.json();
     const { searchParams } = new URL(req.url)
     const search = decodeURIComponent(searchParams.get("search") || "").trim()
     const level = decodeURIComponent(searchParams.get("level") || "").trim()
@@ -41,7 +42,16 @@ export async function GET(req: Request) {
       take: limit,
       orderBy: { id: "desc" },
     })
-
+    const isBuyedCoursesIdsRaw  = await prisma.course.findMany({
+      where: {
+        Users: { some: { id: userId } },
+      },
+      select: {
+        id: true,
+      },
+    })
+    const isBuyedCoursesIds = isBuyedCoursesIdsRaw.map((course) => course.id);
+    console.log("✅ User bought courses IDs:", isBuyedCoursesIds)
     const totalPages = Math.ceil(total / limit)
 
     return NextResponse.json({
@@ -50,6 +60,7 @@ export async function GET(req: Request) {
       total,
       page,
       totalPages,
+      isBuyedCoursesIds,
     })
   } catch (error: any) {
     console.error("❌ Error in /api/courses:", error.message)

@@ -45,7 +45,7 @@ export default function Header() {
             
           </nav>
           <div className="flex gap-3">
-            <Link href="/main" className="bg-yellow-400 px-4 py-2 rounded-xl text-black hover:bg-yellow-500">البدء</Link>
+            
             <div className={open?'hidden mx-6 cursor-pointer':'md:hidden mx-6 cursor-pointer'} onClick={()=>{setOpen(!open);console.log(open)}}>
                         <MdMenu className='text-4xl '/>
                     </div>

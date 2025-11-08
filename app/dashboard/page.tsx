@@ -21,16 +21,23 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  EyeOff,
+  Eye,
 } from "lucide-react"
 import { MdDescription } from "react-icons/md"
 
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
+  const [load1,setLoad1]=useState(false)
   const [load,setLoad]=useState(false)
     const [editingCourse, setEditingCourse] = useState(null as any)
   const [editingBlog, setEditingBlog] = useState(null as any)
   const [error, setError] = useState<string | null>(null)
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
+
   const [totalCourses, setTotalCourses] = useState(0)
   const [totalStudents, setTotalStudents] = useState(0)
   const [totalRevenue, setTotalRevenue] = useState(0)
@@ -65,7 +72,35 @@ export default function AdminDashboard() {
   const [notifications, setNotifications] = useState<any[]>([])
   const [unnotifications, setUnnotifications] = useState<any[]>([])
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showAdmin,setShowAdmin]=useState(true)
   const [contNotifications, setContNotifications] = useState(0)
+   const handleLogin = async (e: React.FormEvent) => {
+      e.preventDefault()
+      setError("")
+      setLoad1(true)
+  
+      try {
+        const res = await fetch("/api/admin/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        })
+  
+        const data = await res.json()
+  
+        if (res.ok) {
+         
+          toast.success("تم التحديث بنحاج")
+        } else {
+          setError(data.message || "اسم المستخدم أو كلمة المرور غير صحيحة")
+        }
+      } catch (err) {
+        console.error("[v0] Login error:", err)
+        setError("حدث خطأ أثناء التجديث ")
+      } finally {
+        setLoad1(false)
+      }
+    }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -412,7 +447,7 @@ export default function AdminDashboard() {
             <h1 className="text-4xl font-bold text-foreground mb-2">لوحة تحكم المسؤول</h1>
             <p className="text-muted-foreground">إدارة الدورات والمدونات والإيرادات</p>
           </div>
-          <div className="relative">
+          <div className="relative flex gap-2">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative p-3 bg-card border border-border rounded-lg hover:bg-muted transition"
@@ -424,7 +459,73 @@ export default function AdminDashboard() {
                 </span>
               )}
             </button>
+            <button className="relative p-3 bg-card border border-border rounded-lg hover:bg-muted transition"
+            onClick={()=>setShowAdmin(!showAdmin)}
+            >
+              تحديث المستخدم
+            </button>
+            {
+              showAdmin &&(
+                <div className="absolute top-full right-0 mt-2 w-96 bg-card border border-border rounded-lg shadow-2xl z-50">
+                  <div className="p-4 border-b border-border flex justify-between items-center">
+                  <h3 className="font-bold text-lg">تحديث المستخدم</h3>
+                  <button
+                    onClick={async() => {setShowAdmin(false);}}
+                    className="text-muted-foreground hover:text-foreground transition"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="p-6">
+                  {/* User update form goes here */}
+                  <form  onSubmit={handleLogin}>
+                     <div>
+              <label className="block text-sm font-medium mb-2 text-foreground">اسم المستخدم</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition bg-background"
+                placeholder="أدخل اسم المستخدم"
+                required
+              />
+            </div>
 
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-medium mb-2 text-foreground">كلمة المرور</label>
+              <div className="relative ">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition bg-background"
+                  placeholder="أدخل كلمة المرور"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+             <Button
+                          type="submit"
+                          disabled={load1 || !username || !password}
+                          className="w-full bg-primary hover:bg-primary/90 text-white py-3 font-medium text-lg transition mt-2"
+                        >
+                          {load1 ? "جاري تحديث ..." : " تحديث"}
+                        </Button>
+
+                  </form>
+                </div>
+                </div>
+
+              )
+            }
             {showNotifications && (
               <div className="absolute top-full right-0 mt-2 w-96 bg-card border border-border rounded-lg shadow-2xl z-50">
                 <div className="p-4 border-b border-border flex justify-between items-center">
