@@ -19,8 +19,7 @@ export default function Home() {
       <Stats />
       <Solutions />
      
-      <FeedbackSection/>
-      <Consultation/>
+    
       <Footer />
       <Chatbot/>
     </main>

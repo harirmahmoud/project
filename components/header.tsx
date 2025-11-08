@@ -3,10 +3,20 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { MdMenu } from "react-icons/md"
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import ResponsiveMenu from "./ResponsiveMenue"
+import { translations } from "@/lib/translations"
+import LanguageSwitcher from "./language-switcher"
 
 export default function Header() {
+    const [language, setLanguage] = useState<string>("ar")
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem("language") || "ar"
+    setLanguage(savedLang)
+  }, [])
+
+  const t = translations[language as keyof typeof translations]
    const [open, setOpen] = useState(false)
       const handleToggle = () => {
           setOpen(!open)
@@ -27,20 +37,20 @@ export default function Header() {
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="/" className="text-foreground hover:text-primary transition hover:text-primary">
-              الرئيسية
+              {t.home}
             </Link>
             <Link href="/blogs" className="text-foreground hover:text-primary transition hover:text-primary">
-              مقالات
+              {t.blog}
             </Link>
 
-            <Link href="#consultation" className="text-foreground hover:text-primary transition hover:text-primary">
-              استشارات
+            <Link href="/consulation" className="text-foreground hover:text-primary transition hover:text-primary">
+              {t.consultation}
             </Link>
             <Link href="/courses" className="text-foreground hover:text-primary transition hover:text-primary">
-              كورسات
+              {t.courses}
             </Link>
-            <Link href="#feedback" className="text-foreground hover:text-primary transition hover:text-primary">
-              اقتراحات
+            <Link href="/feedback" className="text-foreground hover:text-primary transition hover:text-primary">
+              {t.feedback}
             </Link>
             
           </nav>
@@ -50,7 +60,11 @@ export default function Header() {
                         <MdMenu className='text-4xl '/>
                     </div>
           {/* CTA Button */}
-          
+          <LanguageSwitcher />
+          <Link href={"/sign-in"}>
+           <Button className="bg-yellow-400 text-black hover:bg-yellow-500">البدء</Button>
+          </Link>
+         
           </div>
 
            <ResponsiveMenu open={open as boolean} setOpen={setOpen as Dispatch<SetStateAction<boolean>>}/>

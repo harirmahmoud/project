@@ -1,13 +1,23 @@
+"use client"
 import { Card } from "@/components/ui/card"
+import { translations } from "@/lib/translations"
+import { useEffect, useState } from "react"
 
 export default function Solutions() {
+        const [language, setLanguage] = useState<string>("ar")
+    
+      useEffect(() => {
+        const savedLang = localStorage.getItem("language") || "ar"
+        setLanguage(savedLang)
+      }, [])
+       const t = translations[language as keyof typeof translations]
   return (
     <section className="py-20 md:py-32 bg-muted/30" id="solution">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">حلول أمن سيبراني شاملة</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{t.solution1}</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            نقدم مجموعة شاملة من الحلول الأمنية والخدمات الاستشارية والتدريبية
+           {t.solution2}
           </p>
         </div>
 
@@ -17,30 +27,30 @@ export default function Solutions() {
             <div>
               <h3 className="text-xl font-bold text-foreground mb-3 flex items-center gap-2">
                 <span className="inline-flex p-2 bg-primary text-primary-foreground rounded-lg">🛡️</span>
-                تدريب خواص
+               {t.solution3}
               </h3>
               <p className="text-muted-foreground">
-                برامج تدريبية متخصصة ومكثفة للكوادر الوطنية في مختلف مجالات الأمن السيبراني والدفاع عن الأنظمة
+                {t.solution4}
               </p>
             </div>
 
             <div>
               <h3 className="text-xl font-bold text-foreground mb-3 flex items-center gap-2">
                 <span className="inline-flex p-2 bg-primary text-primary-foreground rounded-lg">🔐</span>
-                استشارات عملياتية
+                {t.solution5}
               </h3>
               <p className="text-muted-foreground">
-                تقديم استشارات متقدمة في مجالات الأمن السيبراني والحماية من التهديدات والهجمات الرقمية
+                {t.solution6}
               </p>
             </div>
 
             <div>
               <h3 className="text-xl font-bold text-foreground mb-3 flex items-center gap-2">
                 <span className="inline-flex p-2 bg-primary text-primary-foreground rounded-lg">📊</span>
-                أبحاث متقدمة
+               {t.solution7}
               </h3>
               <p className="text-muted-foreground">
-                إجراء أبحاث علمية متقدمة وتطوير حلول مبتكرة في مجالات الأمن السيبراني والتكنولوجيا الحديثة
+              {t.solution8}
               </p>
             </div>
           </div>

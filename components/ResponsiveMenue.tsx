@@ -1,11 +1,20 @@
-import React from 'react'
+"use client"
+import React, { useEffect, useState } from 'react'
 import {motion,AnimatePresence} from 'framer-motion'
 import {  X } from 'lucide-react'
 import Link from 'next/link'
+import { translations } from '@/lib/translations'
 
 
 export default function ResponsiveMenu({open,setOpen}:{open:boolean,setOpen:React.Dispatch<React.SetStateAction<boolean>>}) {
+       const [language, setLanguage] = useState<string>("ar")
     
+      useEffect(() => {
+        const savedLang = localStorage.getItem("language") || "ar"
+        setLanguage(savedLang)
+      }, [])
+    
+      const t = translations[language as keyof typeof translations]
   return (
     <AnimatePresence>
 {
@@ -27,20 +36,20 @@ export default function ResponsiveMenu({open,setOpen}:{open:boolean,setOpen:Reac
                 </div>
                 <div className='flex flex-col justify-center items-center gap-10'>
                     <Link href="/" className="text-white hover:text-gray-300 transition hover:text-primary">
-              الرئيسية
+              {t.home}
             </Link>
             <Link href="/blogs" className="text-white hover:text-gray-300 transition hover:text-primary">
-              مقالات
+              {t.blog}
             </Link>
 
             <Link href="/consultations" className="text-white hover:text-gray-300 transition hover:text-primary">
-              استشارات
+              {t.consultation}
             </Link>
             <Link href="/courses" className="text-white hover:text-gray-300 transition hover:text-primary">
-              كورسات
+              {t.courses}
             </Link>
-            <Link href="/suggestions" className="text-white hover:text-gray-300 transition hover:text-primary">
-              اقتراحات
+            <Link href="/feedback" className="text-white hover:text-gray-300 transition hover:text-primary">
+              {t.feedback}
             </Link>
                 </div>
                  

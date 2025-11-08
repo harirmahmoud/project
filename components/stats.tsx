@@ -1,31 +1,41 @@
+"use client"
 import { MessageSquare, Users, TrendingUp, BookOpen } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { useEffect, useState } from "react"
+import { translations } from "@/lib/translations"
 
 export default function Stats() {
+        const [language, setLanguage] = useState<string>("ar")
+    
+      useEffect(() => {
+        const savedLang = localStorage.getItem("language") || "ar"
+        setLanguage(savedLang)
+      }, [])
+       const t = translations[language as keyof typeof translations]
   const stats = [
     {
       icon: MessageSquare,
       number: "485",
-      label: "المشاورات",
-      description: "تقديم الاستشارات المتخصصة والدعم الفني",
+      label: t.stats1,
+      description: t.statsDesc1,
     },
     {
       icon: Users,
       number: "2,540",
-      label: "المتدربين",
-      description: "تدريب متقدم في مجالات الأمن السيبراني",
+      label: t.stats2,
+      description: t.statsDesc2,
     },
     {
       icon: TrendingUp,
       number: "98%",
-      label: "رضا العملاء",
-      description: "نسبة عالية من رضا عملائنا",
+      label: t.stats3,
+      description: t.statsDesc3,
     },
     {
       icon: BookOpen,
       number: "127",
-      label: "الدراسات والأبحاث",
-      description: "أبحاث متقدمة في مجالات الأمن السيبراني",
+      label: t.stats4,
+      description: t.statsDesc4,
     },
   ]
 
@@ -33,9 +43,9 @@ export default function Stats() {
     <section className="py-20 md:py-32 bg-white" id="stats">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">الأثر والدراجات</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{t.stats5}</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            تأثيرنا المتزايد في مجال الأمن السيبراني الوطني والإقليمي
+            {t.stats6}
           </p>
         </div>
 

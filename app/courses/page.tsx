@@ -12,10 +12,18 @@ import Footer from "@/components/footer"
 import Chatbot from "@/components/chatbot"// Assuming Chatbot component is declared somewhere
 import { useUser } from "@clerk/nextjs"
 import { toast } from "react-toastify"
+import { translations } from "@/lib/translations"
 
 const categories = ["الكل", "مبتدئ", "متوسط", "متقدم"] // Assuming categories are defined somewhere
 
 export default function CoursesPage() {
+        const [language, setLanguage] = useState<string>("ar")
+    
+      useEffect(() => {
+        const savedLang = localStorage.getItem("language") || "ar"
+        setLanguage(savedLang)
+      }, [])
+       const t = translations[language as keyof typeof translations]
   const [selectedCategory, setSelectedCategory] = useState("الكل")
   const [searchQuery, setSearchQuery] = useState("")
   const [courses, setCourses] = useState<Course[]>([])
@@ -101,9 +109,9 @@ export default function CoursesPage() {
       {/* ... existing hero section ... */}
       <section className="bg-primary text-primary-foreground py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">دوراتنا التدريبية</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t.course1}</h1>
           <p className="text-lg text-primary-foreground/90 max-w-2xl mx-auto">
-            تعلم أحدث مهارات الأمن السيبراني من خلال دورات متخصصة وموثوقة
+           {t.course2}
           </p>
         </div>
       </section>
@@ -115,7 +123,7 @@ export default function CoursesPage() {
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <input
               type="text"
-              placeholder="ابحث عن الدورات..."
+              placeholder={t.course3}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value)
@@ -141,7 +149,7 @@ export default function CoursesPage() {
                 variant={selectedCategory === category ? "default" : "outline"}
                 className={selectedCategory === category ? "bg-primary" : ""}
               >
-                {category}
+                {category === "الكل" ? t.categories[0] : category==="مبتدئ"? t.categories[1]:category==="متوسط"? t.categories[2]:t.categories[3]}
               </Button>
             ))}
           </div>
@@ -153,7 +161,7 @@ export default function CoursesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">جاري التحميل...</p>
+              <p className="text-muted-foreground">{t.course4}</p>
             </div>
           ) : (
             <>
@@ -167,7 +175,7 @@ export default function CoursesPage() {
                         className="w-full h-full object-cover hover:scale-105 transition-transform"
                       />
                       <div className="absolute top-3 right-3">
-                        <Badge className="bg-primary text-primary-foreground">{course.level}</Badge>
+                        <Badge className="bg-primary text-primary-foreground">{course.level === "الكل" ? t.categories[0] : course.level==="مبتدئ"? t.categories[1]:course.level==="متوسط"? t.categories[2]:t.categories[3]}</Badge>
                       </div>
                     </div>
                     <div className="p-6 flex flex-col flex-grow">
@@ -181,14 +189,14 @@ export default function CoursesPage() {
                       <p className="text-muted-foreground mb-4 line-clamp-2 flex-grow">{course.description}</p>
                       <div className="flex items-center justify-between mb-4 pt-4 border-t border-border">
                         <span className="font-bold text-primary">
-                          {course.price === 0 ? "مجاني" : `${course.price} DA`}
+                          {course.price === 0 ? t.course11 : `${course.price} DA`}
                         </span>
                       </div>
                       <Button onClick={()=>{isBuy.includes(course.id) ? null : handleBuy(course.id)}} className={isBuy.includes(course.id) ?"w-full bg-primary hover:bg-primary/90 text-primary-foreground":"w-full"} disabled={isBuy.includes(course.id)}>
                         {load ?(
                           <Loader2 className="w-4 h-4 animate-spin text-black" />
                         ) : (
-                          isBuy.includes(course.id) ? "مسجل بالفعل" : "سجل الآن"
+                          isBuy.includes(course.id) ? t.course5 : t.course6
                         )}
                       </Button>
                     </div>
@@ -199,7 +207,7 @@ export default function CoursesPage() {
               {courses.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-lg text-muted-foreground">
-                    {searchQuery ? "لم نجد دورات تطابق بحثك" : "لم نجد دورات في هذه الفئة"}
+                    {searchQuery ? t.course7 : t.course8}
                   </p>
                 </div>
               )}
@@ -214,7 +222,7 @@ export default function CoursesPage() {
                     className="gap-2"
                   >
                     <ChevronRight className="w-4 h-4" />
-                    السابق
+                    {t.course9}
                   </Button>
 
                   <div className="flex gap-1">
@@ -238,7 +246,7 @@ export default function CoursesPage() {
                     disabled={currentPage === totalPages}
                     className="gap-2"
                   >
-                    التالي
+                    {t.course10}
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
                 </div>

@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken"
 const SECRET = process.env.JWT_SECRET
 
 export const runtime = "nodejs";
-const isProtectedRoute=createRouteMatcher(["/main(.*)","/courses(.*)","/blogs(.*)"]);
+const isProtectedRoute=createRouteMatcher(["/main(.*)","/courses(.*)","/consulation(.*)"]);
 
 export default clerkMiddleware(async(auth,req)=>{
   const {userId}=await auth()

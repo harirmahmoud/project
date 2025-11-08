@@ -1,22 +1,32 @@
+"use client"
 import { Lock, Globe, Settings } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { useEffect, useState } from "react"
+import { translations } from "@/lib/translations"
 
 export default function Mission() {
+        const [language, setLanguage] = useState<string>("ar")
+    
+      useEffect(() => {
+        const savedLang = localStorage.getItem("language") || "ar"
+        setLanguage(savedLang)
+      }, [])
+       const t = translations[language as keyof typeof translations]
   const items = [
     {
       icon: Lock,
-      title: "الحماية",
-      description: "نحن نسعى للدفاع عن الأمن السيبراني الوطني من خلال الابتكار والخبرة المتقدمة",
+      title: t.mission1,
+      description: t.mission4,
     },
     {
       icon: Globe,
-      title: "الالتزام",
-      description: "نعمل على حماية الأنظمة الحكومية والاستراتيجية الحيوية في الدولة",
+      title: t.mission2,
+      description: t.mission5,
     },
     {
       icon: Settings,
-      title: "التطوير",
-      description: "تقديم أحدث الحلول الأمنية والتدريبات المتخصصة للكوادر الجزائرية",
+      title: t.mission3,
+      description: t.mission6,
     },
   ]
 
@@ -24,9 +34,8 @@ export default function Mission() {
     <section className="py-20 md:py-32 bg-white" id="missions">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">مهمتنا</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            نحن متخصصون في تعزيز الأمن السيبراني من خلال التدريب المتقدم والاستشارات والأبحاث المتقدمة
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{t.mission7}</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">{t.mission8}
           </p>
         </div>
 
