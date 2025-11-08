@@ -1,15 +1,66 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  firstName    String
+  lastName     String
+  password     String?
+  createdAt    DateTime       @default(now())
+  
+  Blogs        Blog[]         @relation("UserBlogs")
+  Courses      Course[]       @relation("UserCourses")
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  photo       String   @db.Text
+  link        String
+  duration    String
+  instructor  String?
+  createdAt   DateTime @default(now())
+  level       String
+  Users       User[]   @relation("UserCourses")
+}
+
+model Blog {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String  
+  createdAt   DateTime @default(now())
+  author      String?
+  category    String
+  description String
+  status      String
+  image       String   @db.Text
+  Users       User[]   @relation("UserBlogs")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  message   String?
+  type      String
+  email     String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+ 
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
 }

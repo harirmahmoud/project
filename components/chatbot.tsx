@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { X, Send, MessageCircle } from "lucide-react"
+import axios from "axios"
 
 interface Message {
   id: string
@@ -9,9 +10,16 @@ interface Message {
   sender: "user" | "assistant"
   timestamp: Date
 }
-
+interface ChatMessage {
+  input: string;
+  stl: boolean;
+}
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false)
+  const apiKey=process.env.NEXT_PUBLIC_GROQ_API_KEY;
+  const [chat, setChat] = useState<ChatMessage[]>([]);
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -50,6 +58,46 @@ export default function Chatbot() {
     }, 1000)
   }
 
+  const handleText = () => {
+    if (!text.trim()) return;
+    setLoading(true);
+
+    // Add user message
+    setChat((prev) => [...prev, { input: text, stl: true }]);
+
+    axios
+      .post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: 'You are a helpful assistant.' },
+            { role: 'user', content: text },
+          ],
+          temperature: 0.7,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+      .then((res) => {
+        const reply = res.data.choices[0].message.content;
+        setChat((prev) => [...prev, { input: reply, stl: false }]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        console.log("API key:", apiKey);
+
+        setLoading(false);
+      });
+
+    setText('');
+  };
+
   return (
     <>
       {/* Floating Chat Button */}
@@ -80,20 +128,20 @@ export default function Chatbot() {
 
           {/* Messages Container */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
+            {chat.map((message, index) => (
+              <div key={index} className={`flex ${message.stl ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-xs px-4 py-3 rounded-lg ${
-                    message.sender === "user"
+                    message.stl
                       ? "bg-[#1B5E20] text-white rounded-br-none"
                       : "bg-gray-100 text-gray-800 rounded-bl-none"
                   }`}
                 >
-                  <p className="text-sm">{message.text}</p>
+                  <p className="text-sm">{message.input}</p>
                 </div>
               </div>
             ))}
-            {isLoading && (
+            {loading && (
               <div className="flex justify-start">
                 <div className="bg-gray-100 text-gray-800 px-4 py-3 rounded-lg rounded-bl-none">
                   <div className="flex space-x-2">
@@ -112,15 +160,15 @@ export default function Chatbot() {
             <div className="flex gap-2">
               <input
                 type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleText()}
                 placeholder="Type your question..."
                 className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#1B5E20]"
               />
               <button
-                onClick={handleSend}
-                disabled={isLoading || !input.trim()}
+                onClick={handleText}
+                disabled={loading || !text.trim()}
                 className="bg-[#1B5E20] text-white p-2 rounded-lg hover:bg-[#0D3B15] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 aria-label="Send message"
               >

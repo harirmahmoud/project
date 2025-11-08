@@ -2,10 +2,21 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { MdMenu } from "react-icons/md"
+import { Dispatch, SetStateAction, useState } from "react"
+import ResponsiveMenu from "./ResponsiveMenue"
 
 export default function Header() {
+   const [open, setOpen] = useState(false)
+      const handleToggle = () => {
+          setOpen(!open)
+      }
+      const handleClose = () => {
+          setOpen(false)
+      }
+   
   return (
-    <header className="bg-white border-b border-border">
+    <header className="bg-white border-b border-border fixed top-0 w-full z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -15,25 +26,38 @@ export default function Header() {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="#hero" className="text-foreground hover:text-primary transition hover:text-primary">
+            <Link href="/" className="text-foreground hover:text-primary transition hover:text-primary">
               الرئيسية
             </Link>
-            <Link href="#missions" className="text-foreground hover:text-primary transition hover:text-primary">
-              الخدمات
+            <Link href="/blogs" className="text-foreground hover:text-primary transition hover:text-primary">
+              مقالات
             </Link>
-           
-            <Link href="#solution" className="text-foreground hover:text-primary transition hover:text-primary">
-              حلولنا
-            </Link>
-            <Link href="#footer" className="text-foreground hover:text-primary transition hover:text-primary">
-              اتصل بنا
-            </Link>
-          </nav>
 
+            <Link href="#consultation" className="text-foreground hover:text-primary transition hover:text-primary">
+              استشارات
+            </Link>
+            <Link href="/courses" className="text-foreground hover:text-primary transition hover:text-primary">
+              كورسات
+            </Link>
+            <Link href="#feedback" className="text-foreground hover:text-primary transition hover:text-primary">
+              اقتراحات
+            </Link>
+            
+          </nav>
+          <div className="flex gap-3">
+            <Link href="/main" className="bg-yellow-400 px-4 py-2 rounded-xl text-black hover:bg-yellow-500">البدء</Link>
+            <div className={open?'hidden mx-6 cursor-pointer':'md:hidden mx-6 cursor-pointer'} onClick={()=>{setOpen(!open);console.log(open)}}>
+                        <MdMenu className='text-4xl '/>
+                    </div>
           {/* CTA Button */}
-          <Button className="bg-yellow-400 text-black hover:bg-yellow-500">البدء</Button>
+          
+          </div>
+
+           <ResponsiveMenu open={open as boolean} setOpen={setOpen as Dispatch<SetStateAction<boolean>>}/>
         </div>
+       
       </div>
+      
     </header>
   )
 }
