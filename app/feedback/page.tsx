@@ -49,11 +49,8 @@ export default function FeedbackPage() {
         body: JSON.stringify(formData),
       })
 
-      if (!response.ok) {
-        toast.error(t.feedback1)
-        throw new Error(t.feedback1)
-      }
-      toast.success(t.feedback2)
+     
+      
       setSubmitted(true)
       setFormData({
        
@@ -64,8 +61,8 @@ export default function FeedbackPage() {
       })
       setTimeout(() => setSubmitted(false), 5000)
     } catch (err) {
-        toast.error(t.feedback3)
-      setError(err instanceof Error ? err.message : t.feedback3)
+        
+      setError(err instanceof Error ? err.message : "jj")
     } finally {
         
       setLoading(false)
@@ -79,8 +76,8 @@ export default function FeedbackPage() {
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-primary/10 to-background py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{t.feedback4}</h1>
-            <p className="text-lg text-muted-foreground">{t.feedback5}</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4"></h1>
+            <p className="text-lg text-muted-foreground"></p>
           </div>
         </section>
 
@@ -100,7 +97,7 @@ export default function FeedbackPage() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder={t.feedback17}
+                    placeholder="ll"
                     className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     required
                   />
@@ -109,18 +106,14 @@ export default function FeedbackPage() {
                 {/* Type and Rating */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">{t.feedback6}</label>
+                    <label className="block text-sm font-medium text-foreground mb-2"></label>
                     <select
                       name="type"
                       value={formData.type}
                       onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     >
-                      <option value="feedback">{t.feedback7}</option>
-                      <option value="suggestion">{t.feedback9}</option>
-                      <option value="bug">{t.feedback10}</option>
-                      <option value="feature">{t.feedback11}</option>
-                      <option value="complaint">{t.feedback12}</option>
+                    
                     </select>
                   </div>
 
@@ -129,12 +122,12 @@ export default function FeedbackPage() {
 
                 {/* Message */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">{t.feedback13}</label>
+                 
                   <Textarea
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder={t.feedback18}
+                    placeholder="kllk"
                     className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary min-h-32"
                     required
                   />
@@ -146,7 +139,7 @@ export default function FeedbackPage() {
                 {/* Success Message */}
                 {submitted && (
                   <div className="p-4 bg-green-100 text-green-800 rounded-lg">
-                    ✓ {t.feedback14}
+                    ✓ 
                   </div>
                 )}
 
@@ -157,7 +150,7 @@ export default function FeedbackPage() {
                     disabled={loading}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium transition-colors disabled:opacity-50"
                   >
-                    {loading ? t.feedback16 : t.feedback15}
+                    
                   </Button>
                 </div>
               </form>

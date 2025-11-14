@@ -4,12 +4,18 @@ import { stat } from "fs"
 
 export const translations = {
   ar: {
+    addcourse:"تم اضافة دورة جديدة",
+    addblog:"تم اضافة مقالة جديدة",
     home: "الرئيسية",
     services: "الخدمات",
     courses: "الدورات",
+    course:"دورة",
+    blogs:"مقالة",
     training: "التدريب",
     solutions: "حلولنا",
-    blog: "المدونة",
+    blog: "المقالات",
+    suggestions:"اقتراحات",
+    service:"طلب خدمة",
     consultation: "الاستشارة",
     contact: "اتصل بنا",
     dashboard: "لوحة التحكم",
@@ -59,67 +65,192 @@ export const translations = {
     footer9:"الهاتف",
     footer10:"الموقع: الجزائر",
     footer11:"© 2025 جميع الحقوق محفوظة - CyberGuardAlgeria",
-    feedback1:"فشل إرسال التقييم",
-    feedback2:"تم إرسال التقييم بنجاح",
-    feedback3:"حدث خطأ ما أثناء الإرسال",
-    feedback4:"شارك معنا رأيك",
-    feedback5:"نقدر ملاحظاتك لتحسين خدماتنا",
-    feedback6:"نوع التقييم",
-    feedback7:"التقييم",
-    feedback8:"تقييم عام",
-    feedback9:"اقتراح",
-    feedback10:"مشكلة تقنية",
-    feedback11:"طلب ميزة",
-    feedback12:"شكوى",
-    feedback13:"الرسالة",
-    feedback14:"شكراً لك على تقييمك! سنراجع ملاحظاتك قريباً",
-    feedback15:"إرسال التقييم",
-    feedback16:"جاري الإرسال...",
-    feedback17:"أدخل بريدك الإلكتروني",
-    feedback18:"شارك معنا تفاصيل تقييمك أو اقتراحك...",
-    consultationSubjects:[
-    "استشارة أمنية عامة",
-    "حماية البنية التحتية",
-    "حماية البيانات",
-    "الامتثال والتنظيم",
-    "تدريب الموارد البشرية",
-    "أخرى",
-  ],
-  suggestion1:"طلب استشارة",
-  suggestion2:" تواصل مع فريقنا المتخصص وتلقى استشارة مجانية خلال 24 ساعة",
-  suggestion3:"موضوع الاستشارة ",
-  suggestion4:"اختر موضوع من القائمة",
-  suggestion5:" الوصف التفصيلي ",
-  suggestion6:"اشرح احتياجاتك واستفساراتك بالتفصيل",
-  suggestion7:" أوافق على شروط الاستشارة وسياسة الخصوصية الخاصة بنا",
-  suggestion8:"✓ تم استقبال طلبك بنجاح",
-  suggestion9:"سيتواصل معك فريقنا خلال 24 ساعة",
-  suggestion10:"دعم فني متاح طوال الوقت",
-  suggestion11:"سريع",
-  suggestion12:"رد على طلبك خلال 24 ساعة",
-  suggestion13:"جاري الإرسال...",
-  suggestion14:"إرسال طلب الاستشارة",
-  course1:"دوراتنا التدريبية",
-  course2:" تعلم أحدث مهارات الأمن السيبراني من خلال دورات متخصصة وموثوقة",
-  course3:"ابحث عن الدورات...",
-  course4:"جاري التحميل...",
-  course5:"مسجل بالفعل",
-  course6:"سجل الآن",
-  course7:"لم نجد دورات تطابق بحثك" ,
-  course8:"لم نجد دورات في هذه الفئة",
-  course9:"السابق",
-  course10:"التالي",
-  course11:"مجاني" ,
-  categories : ["الكل", "مبتدئ", "متوسط", "متقدم"] ,
-
+    all:"الكل",
+    Cybersecurity:"الأمان السيبراني",
+    Digitalprotection:"الحماية الرقمية",
+    informationtechnology:"تكنولوجيا المعلومات",
+    searchblog:"ابحث عن المقالات...",
+    loading:"جاري التحميل...",
+    ReadArticle:"اقرا المقالة",
+    previous:"السابق",
+    blogHead:"الابحاث و المقالات",
+    blogmain:"ابق على اطلاع بابحاث الامن السيبراني وتحليل التهديدات و رؤى الخباراء من فريقنا من المتخصصين في الامن",
+    beginner:"مبتدئ",
+    middle:"متوسط",
+    Expert:"خبير",
+    nocourse:"لم يتم العثور على الدورات",
+    buycourse:"اشتري الدورة",
+    next:"التالي",
+    searchcourse:"ابحث عن الدورات...",
+    coursehead:"دوراتنا التعليمية",
+    corsemain:"قم بتطوير مهاراتك في الامن السيبراني من خلال دوراتنا المصممة خصيصا لجميع المستويات",
+    conhead:" استشارة خبراء الأمن السيبراني",
+    conmain:"احصل على نصائح مخصصة في الأمن السيبراني من خبرائنا المعتمدين. نقدم حلولاً شاملة مصممة خصيصًا لاحتياجاتك.",
+    conhead1:"طلب استشارة",
+    conmain1:"املا النموذج أدناه وسنتواصل معك خبرائنا خلال 24 ساعة",
+    fullName:"الاسم الكامل ",
+    email:"البريد الإلكتروني ",
+    subjectcon:"موضوع الاستشارة ",
+    descon:"الوصف التفصيلي ",
+    fullNmaeInput:"أدخل اسمك الكامل",
+    emailInput:"أدخل بريدك الإلكتروني",
+    chooseSub:"اختر موضوعًا",
+    des:"يرجى وصف متطلباتك في الأمن السيبراني، والتحديات الحالية وما تأمل في تحقيقه من خلال استشارتنا...",
+    sendcon:" إرسال طلب الاستشارة",
+    quest:"الأسئلة الشائعة",
+    quest1:"أسئلة شائعة حول خدمات الاستشارة لدينا",
+    quest2:"كم تستغرق الاستشارة عادة؟",
+    res2:"تعتمد مدة الاستشارة الأولية على مدى تعقيد متطلباتك. عادةً ما تستغرق المكالمة الأولى من 45 إلى 60 دقيقة.",
+    quest3:"هل تقدمون تقييمات أمنية في الموقع؟",
+    res3:"نعم، نحن نقدم كلاً من التقييمات عن بُعد والتقييمات في الموقع (on-site) بناءً على احتياجات عملك ومتطلبات الامتثال.",
+    quest4:"ما هي الشهادات التي يحملها مستشاروكم؟",
+    res4:"يتمتع مستشارونا بشهادات رائدة في الصناعة مثل CISSP, OSCP, CISM, وشهادات متخصصة في AWS و Azure.",
+    quest5:"هل تقدم الاستشارات باللغة العربية؟",
+    res5:"بالتأكيد. فريقنا يتقن اللغتين العربية والإنجليزية لضمان تواصل واضح وفعال.",
+    titlesug:" عنوان الاقتراح",
+    message:" الرسالة التفصيلية",
+    messageIput:"يرجى تقديم معلومات مفصلة حول اقتراحك...",
+    sugg:"إرشادات الاقتراح:",
+    list:[
+      "كن محددًا بشأن الميزة أو التحسين الذي تقترحه.",
+      "وضح كيف سيستفيد المستخدمون أو المنصة من ذلك.",
+      "أدرج أي أمثلة أو مراجع ذات صلة.",
+      "ضع في اعتبارك الجدوى وتأثيرها على المستخدمين."
+    ],
+    sendsug:"إرسال الاقتراح",
+    inputsug:"عنوان موجز لاقتراحك",
+    headsug:"شارك أفكارك",
+    mainsug:"ساعدنا في تحسين سايبر جارد الجزائر! اقتراحاتك وملاحظاتك لا تقدر بثمن في تشكيل مستقبل منصتنا.",
+    headser:"طلب خدمة",
+    mainser:"يرجى ملء النموذج أدناه لطلب الخدمة التي تحتاجها.",
+    titleser:"نموذج طلب خدمة",
+    phone:"رقم الهاتف ",
+    phoneInput:"أدخل رقم هاتفك",
+    org:"المؤسسة أو الجهة التابعة ",
+    orgInput:"أدخل اسم المؤسسة أو الجهة التابعة",
+    type:"نوع الخدمة المطلوبة ",
+    typeInput:"اختر نوع الخدمة المطلوبة",
+    list1:[
+      "دعم تقني",
+      "خدمة حسابات",
+      "أخرى"
+    ],
+    level:"مستوى الأولوية ",
+    list2:[
+      "منخفضة",
+      "متوسطة",
+      "مرتفعة"
+    ],
+    levelInput:"اختر مستوى الأولوية",
+    desres:"وصف الخدمة المطلوبة ",
+    desInput:"صف تفاصيل الخدمة التي تحتاجها",
+    sendres:"إرسال الطلب",
   },
   en: {
+    headser: "Service Request", mainser: "Please fill out the form below to request the service you need.", titleser: "Service Request Form",
+    desres: "Describe the service requested",
+
+desInput: "Describe the details of the service you need",
+
+sendres: "Submit the request",
+    level: "Priority Level",
+
+list2:[
+"Low",
+
+"Medium",
+
+"High"
+],
+
+levelInput: "Select Priority Level",
+    list1:[
+"Technical Support",
+
+"Account Services",
+
+"Other"
+
+],
+    type:"Type of service requested",
+
+typeInput:"Select the type of service requested",
+    org: "Organization or affiliated entity",
+
+orgInput: "Enter the name of the organization or affiliated entity",
+    phone:"Phone number",
+    phoneInput:"Enter youe phone number",
+    headsug: "Share your ideas,",
+
+mainsug: "Help us improve CyberGuard Algeria! Your suggestions and feedback are invaluable in shaping the future of our platform.",
+    inputsug: "A brief title for your proposal",
+    sendsug: "Send the proposal",
+    list:[
+
+"Be specific about the feature or improvement you are proposing.",
+
+"Explain how users or the platform will benefit.",
+
+"Include any relevant examples or references.",
+
+"Consider the feasibility and impact on users."],
+    sugg: "Suggestion guidelines:",
+    messageIput: "Please provide detailed information about your proposal...",
+    message:"The detailed message",
+    titlesug:"title of suggestion",
+     quest:"Frequently Asked Questions",
+    quest1:"Frequently Asked Questions about Our Consulting Services",
+    quest2:"How long does a consultation usually take?",
+    res2:"The duration of the initial consultation depends on the complexity of your requirements. The first call typically lasts 45 to 60 minutes.",
+    quest3:"Do you offer on-site security assessments?",
+    res3:"Yes, we offer both remote and on-site assessments based on your business needs and compliance requirements.",
+    quest4:"What certifications do your consultants hold?",
+    res4:"Our consultants hold industry-leading certifications such as CISSP, OSCP, CISM, and specialized certifications in AWS and Azure.",
+    quest5:"Do you offer consultations in Arabic?",
+    res5:"Absolutely. Our team is fluent in both Arabic and English to ensure clear and effective communication.",
+    sendcon: "Send consultation request",
+    des: "Please describe your cybersecurity requirements, current challenges and what you hope to achieve through our consultation...",
+    chooseSub:"choose the subkect",
+    fullNmaeInput:"Inter your full name",
+    emailInput:"Inter your email address",
+    fullName:"Full name",
+    email:"email",
+    subjectcon:"Subject of consultation",
+    descon:"Description of consultation",
+    conhead: "Consult with cybersecurity experts,",
+
+conmain: "Get personalized cybersecurity advice from our certified experts. We offer comprehensive solutions tailored to your needs.",
+
+conhead1: "Request a consultation,",
+
+conmain1: "Fill out the form below and our experts will contact you within 24 hours.",
+    corsemain:"Develop your cybersecurity skills through our courses designed specifically for all levels.",
+    coursehead:"Our educational courses",
+    searchcourse:"Search for courses ...",
+    next:"next",
+    buycourse:"buy the course",
+    nocourse:"courses not found",
+    middle:"middle",
+    Expert:"Expert",
+    beginner:"beginner",
+    blogmain:"Stay informed with cybersecurity research, threat analysis, and expert insights from our team of security specialists.",
+    blogHead:"Research and articles",
+    previous:"previous",
+    ReadArticle:"Read Article",
+    loading:"Loading ...",
+    searchblog:"Search for an article ...",
+    addblog:"add new articles",
+    addcourse:"Add new course",
+    course:"course",
+    blogs:"blog",
+    suggestions:"suggestions",
+    service:"service request",
     home: "Home",
     services: "Services",
     courses: "Courses",
     training: "Training",
     solutions: "Solutions",
-    blog: "Blog",
+    blog: "Articles",
     consultation: "Consultation",
     contact: "Contact",
     dashboard: "Dashboard",
@@ -168,86 +299,10 @@ export const translations = {
     footer9:"Phone",
     footer10:"Place : Algeria",
     footer11:"© 2025 All rights reserved - CyberGuardAlgeria",
-     feedback1:"Failed to submit assessment",
-    feedback2:"The evaluation was successfully submitted",
-    feedback3:"An error occurred during transmission.",
-    feedback4:"Share your opinion with us.",
-    feedback5:"We appreciate your feedback to improve our services.",
-    feedback6:"Type of assessment",
-    feedback7:"Evaluation",
-    feedback8:"Overall assessment",
-    feedback9:"Suggestion",
-    feedback10:"Technical problem",
-    feedback11:"Request a feature",
-    feedback12:"Complaint",
-    feedback13:"Message",
-    feedback14:"Thank you for your review! We will review your feedback soon.",
-    feedback15:"Submit the evaluation",
-    feedback16:"Sending...",
-    feedback17:"Enter your email",
-    feedback18:"Send the message",
-    consultationSubjects:[
-        "General Security Consulting",
-
-"Infrastructure Protection",
-
-"Data Protection",
-
-"Compliance and Regulation",
-
-"Human Resources Training",
-
-"Other"
-    ],
- suggestion1: "Request a consultation",
-
-suggestion2: "Contact our expert team and receive a free consultation within 24 hours",
-
-suggestion3: "Consultation topic",
-
-suggestion4: "Choose a topic from the list",
-
-suggestion5: "Detailed description",
-
-suggestion6: "Explain your needs and inquiries in detail",
-
-suggestion7: "I agree to the consultation terms and our privacy policy",
-
-suggestion8: "✓ Your request has been successfully received",
-
-suggestion9: "Our team will contact you within 24 hours",
-
-suggestion10: "Technical support available 24/7",
-
-suggestion11: "Fast",
-
-suggestion12: "Your request will be answered within 24 hours",
-
-suggestion13: "Sending...",
-
-suggestion14: "Submit consultation request",
-course1: "Our Training Courses",
-
-course2: "Learn the latest cybersecurity skills through specialized and reliable courses",
-
-course3: "Search for courses...",
-
-course4: "Loading...",
-
-course5: "Already registered"
-,
-course6: "Register now",
-
-course7: "No courses matching your search",
-
-course8: "No courses in this category",
-
-course9: "Previous",
-
-course10: "Next",
-course11:"free",
-categories: ["All", "Beginner", "Intermediate", "Advanced"]
-
+    all:"All",
+    Cybersecurity:"Cybersecurity",
+    Digitalprotection:"Digital protection",
+    informationtechnology:"information technology"
   },
 }
 

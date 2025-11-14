@@ -1,229 +1,229 @@
-"use client"
+// We must mark this as a client component to use interactive components
+// like <Select> and <Accordion>
+"use client";
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
-import Chatbot from "@/components/chatbot"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { translations } from "@/lib/translations"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Loader2, Send } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import Header from "@/components/header";
+import { translations } from "@/lib/translations";
 
 export default function ConsultationPage() {
-             const [language, setLanguage] = useState<string>("ar")
-          
-            useEffect(() => {
-              const savedLang = localStorage.getItem("language") || "ar"
-              setLanguage(savedLang)
-            }, [])
-             const t = translations[language as keyof typeof translations]
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    subject: "",
-    description: "",
-    agreeToTerms: false,
+  const [language, setLanguage] = useState<string>("ar")
+      
+        useEffect(() => {
+          const savedLang = localStorage.getItem("language") || "ar"
+          setLanguage(savedLang)
+        }, [])
+        const t = translations[language as keyof typeof translations]
+  const [formData,setFormData]=useState({
+    fullName:"",
+    email:"",
+    description:"",
+    message:""
   })
-  const [submitted, setSubmitted] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-
-  const consultationSubjects = t.consultationSubjects
-
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target
-    if (type === "checkbox") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: (e.target as HTMLInputElement).checked,
-      }))
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }))
-    }
+  const [loading,setLoading]=useState(false)
+  const handleChange=(value:string,type:string)=>{
+    setFormData({...formData,[type]:value})
   }
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit=async(e:React.FormEvent)=>{
     e.preventDefault()
-
-    if ( !formData.email || !formData.subject || !formData.description) {
-      alert("يرجى ملء جميع الحقول")
+    if(!formData.email|| !formData.description|| !formData.fullName|| !formData.message){
+      toast.error("fill all the input !!")
+      return
+    }
+    setLoading(true)
+    const res=await fetch("/api/notification/sendconsultation", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fullName: formData.fullName,
+        email: formData.email,
+        description: formData.description,
+        message:formData.message,
+      })})
+      if (!res.ok) {
+      toast.error("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.")
+      setLoading(false)
       return
     }
 
-    if (!formData.agreeToTerms) {
-      alert("يجب الموافقة على الشروط والأحكام")
-      return
-    }
-
-    setIsLoading(true)
-
-    try {
-      const response = await fetch("/api/notification/sendconsultation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          
-          email: formData.email,
-          message: formData.subject,
-          description: formData.description,
-        }),
-      })
-
-      if (response.ok) {
-        setSubmitted(true)
-        setFormData({
-          fullName: "",
-          email: "",
-          subject: "",
-          description: "",
-          agreeToTerms: false,
-        })
-        setTimeout(() => setSubmitted(false), 5000)
-      }
-    } catch (error) {
-      console.error("Error submitting consultation:", error)
-      alert("حدث خطأ في إرسال الطلب")
-    } finally {
-      setIsLoading(false)
-    }
+    setFormData({
+      fullName:"",
+    email:"",
+    description:"",
+    message:""
+    })
+    setLoading(false)
+    toast.success("تم إرسال الطلب بنجاح ✅")
   }
-
   return (
-    <div className="min-h-screen bg-background flex flex-col mt-10">
-      <Header />
+    <div className="bg-gray-50 min-h-screen ">
+      <Header/>
+      <main className="max-w-4xl mx-auto space-y-8 mt-20">
+        
+        {/* === Consultation Form Card === */}
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-white p-8">
+            <CardTitle className="text-3xl font-bold text-gray-900">
+              {t.conhead}
+            </CardTitle>
+            <CardDescription className="text-lg pt-2">
+              {t.conmain}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-8 bg-gray-50/50">
+            <h2 className="text-2xl font-semibold mb-6">{t.conhead1}</h2>
+            <p className="mb-6 text-gray-600">
+              {t.conmain1}
+            </p>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-primary/10 to-background py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">{t.suggestion1}</h1>
-          <p className="text-lg text-muted-foreground text-balance">
-            {t.suggestion2}
-          </p>
-        </div>
-      </section>
-
-      {/* Consultation Form */}
-      <section className="flex-1 py-12">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="p-8 md:p-12 bg-card border border-border shadow-lg">
-            <form onSubmit={handleSubmit} className="space-y-8" dir="rtl">
-              {/* Full Name and Email Row */}
-              <div className="grid md:grid-cols-2 gap-6">
-                
-
-                <div className="flex flex-col">
-                  <label htmlFor="email" className="text-sm font-semibold text-foreground mb-2">
-                   {t.footer8}
-                  </label>
-                  <input
-                    type="email"
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {/* Name and Email Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="fullname">{t.fullName}</Label>
+                  <Input id="fullname" placeholder={t.fullNmaeInput} value={formData.fullName} onChange={(e)=>{handleChange(e.target.value,"fullName")}} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">{t.email}</Label>
+                  <Input
                     id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder={t.feedback17}
-                    className="px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    required
+                    type="email"
+                    placeholder={t.emailInput}
+                    value={formData.email} onChange={(e)=>{handleChange(e.target.value,"email")}}
                   />
                 </div>
               </div>
 
-              {/* Subject Dropdown */}
-              <div className="flex flex-col">
-                <label htmlFor="subject" className="text-sm font-semibold text-foreground mb-2">
-                 {t.suggestion3}
-                </label>
-                <select
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  className="px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-                  required
-                >
-                  <option value="">{t.suggestion4}</option>
-                  {consultationSubjects.map((subj) => (
-                    <option key={subj} value={subj}>
-                      {subj}
-                    </option>
-                  ))}
-                </select>
+              {/* Subject Row */}
+              <div className="space-y-2">
+                <Label htmlFor="subject">{t.subjectcon}</Label>
+                <Select onValueChange={(v)=>{handleChange(v,"description")}}>
+                  <SelectTrigger id="subject" className="w-full">
+                    <SelectValue placeholder={t.chooseSub} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pentesting">اختبار الاختراق</SelectItem>
+                    <SelectItem value="compliance">
+                      التدقيق والامتثال (ISO 27001)
+                    </SelectItem>
+                    <SelectItem value="cloud-security">أمن السحابة</SelectItem>
+                    <SelectItem value="incident-response">
+                      الاستجابة للحوادث
+                    </SelectItem>
+                    <SelectItem value="other">موضوع آخر</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Description */}
-              <div className="flex flex-col">
-                <label htmlFor="description" className="text-sm font-semibold text-foreground mb-2">
-                 {t.suggestion5}
-                </label>
-                <textarea
+              {/* Description Row */}
+              <div className="space-y-2">
+                <Label htmlFor="description">{t.descon}</Label>
+                <Textarea
                   id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  placeholder={t.suggestion6}
-                  rows={6}
-                  className="px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                  required
+                  placeholder={t.des}
+                  rows={5}
+                  value={formData.message} onChange={(e)=>{handleChange(e.target.value,"message")}}
                 />
-              </div>
-
-              {/* Terms Checkbox */}
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="agreeToTerms"
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
-                  onChange={handleInputChange}
-                  className="mt-1 w-4 h-4 rounded border-input accent-primary cursor-pointer"
-                  required
-                />
-                <label htmlFor="agreeToTerms" className="text-sm text-muted-foreground">
-                 {t.suggestion7}
-                </label>
               </div>
 
               {/* Submit Button */}
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg font-semibold transition-colors"
-              >
-                {isLoading ? <span>{t.suggestion13}</span> : <span>{t.suggestion14}</span>}
+              <Button type="submit" size="lg" className="w-full text-lg">
+                {
+                  loading?(
+                    <Loader2 className="w-4 h-4 text-white animate-spin"/>
+                  ):(
+                    <>
+                   {t.sendcon}
+                {/* The icon is placed after the text. In RTL, mr-2 adds margin to the right. */}
+                <Send className="mr-2 h-5 w-5" />
+                    </>
+                  )
+                }
+                
               </Button>
-
-              {/* Success Message */}
-              {submitted && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-                  <p className="text-green-700 font-medium">{t.suggestion8}</p>
-                  <p className="text-green-600 text-sm mt-1">{t.suggestion9}</p>
-                </div>
-              )}
             </form>
-          </Card>
+          </CardContent>
+        </Card>
 
-          {/* Info Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <Card className="p-6 bg-card border border-border text-center">
-              <div className="text-3xl font-bold text-primary mb-2">24/7</div>
-              <p className="text-muted-foreground">{t.suggestion10}</p>
-            </Card>
-          
-            <Card className="p-6 bg-card border border-border text-center">
-              <div className="text-3xl font-bold text-primary mb-2">{t.suggestion11}</div>
-              <p className="text-muted-foreground">{t.suggestion12}</p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-      <Chatbot />
+        {/* === FAQ Section === */}
+        <Card className="p-8 mb-15">
+          <CardHeader className="p-0 mb-6">
+            <CardTitle className="text-2xl font-semibold">
+             {t.quest}
+            </CardTitle>
+            <CardDescription className="pt-2">
+              {t.quest1}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger className="text-base">
+                  {t.quest2}
+                </AccordionTrigger>
+                <AccordionContent className="text-base">
+                  {t.res2}
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-2">
+                <AccordionTrigger className="text-base">
+                  {t.quest3}
+                </AccordionTrigger>
+                <AccordionContent className="text-base">
+                 {t.res3}
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-3">
+                <AccordionTrigger className="text-base">
+                   {t.quest4}
+                </AccordionTrigger>
+                <AccordionContent className="text-base">
+                 {t.res4}
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-4">
+                <AccordionTrigger className="text-base">
+                  {t.quest5}
+                </AccordionTrigger>
+                <AccordionContent className="text-base">
+                  {t.res5}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </CardContent>
+        </Card>
+      </main>
     </div>
-  )
+  );
 }

@@ -1,33 +1,36 @@
-import { v2 as cloudinary } from 'cloudinary'
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server"
+import { v2 as cloudinary } from "cloudinary"
 
+// Configure Cloudinary with your credentials
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-  api_key: process.env.CLOUDINARY_API_KEY!,
-  api_secret: process.env.CLOUDINARY_API_SECRET!,
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
 export async function POST(req: Request) {
   try {
     const formData = await req.formData()
-    const file = formData.get('file') as File
-
+    const file = formData.get("file") as Blob | null
     if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
+      return NextResponse.json({ error: "No file uploaded" }, { status: 400 })
     }
 
-    // Convert file to base64 for Cloudinary
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const base64 = `data:${file.type};base64,${buffer.toString('base64')}`
+    // Convert blob to buffer
+    const buffer = Buffer.from(await file.arrayBuffer())
 
-    const uploadResponse = await cloudinary.uploader.upload(base64, {
-      folder: 'nextjs_uploads', // optional folder
+    // Upload to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream({ folder: "uploads" }, (error, res) => {
+        if (error) reject(error)
+        else resolve(res)
+      }).end(buffer)
     })
 
-    return NextResponse.json({ url: uploadResponse.secure_url })
-  } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+    // Return Cloudinary URL
+    return NextResponse.json({ success: true, url: (result as any).secure_url })
+  } catch (error) {
+    console.error("Upload error:", error)
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 })
   }
 }

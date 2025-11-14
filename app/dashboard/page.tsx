@@ -23,6 +23,7 @@ import {
   Loader2,
   EyeOff,
   Eye,
+  User,
 } from "lucide-react"
 import { MdDescription } from "react-icons/md"
 
@@ -59,6 +60,10 @@ export default function AdminDashboard() {
     photo: "",
     link: "",
     description: "",
+    tags: [] as string[],
+    maxUsers:0,
+    startedAt: "",
+
   })
   const [newBlog, setNewBlog] = useState({
     title: "",
@@ -67,13 +72,16 @@ export default function AdminDashboard() {
     status: "مسودة",
     image: "",
     content:"",
-    author:""
+    author:"",
+    tags:[] as string[],
+
   })
   const [notifications, setNotifications] = useState<any[]>([])
   const [unnotifications, setUnnotifications] = useState<any[]>([])
   const [showNotifications, setShowNotifications] = useState(false)
-  const [showAdmin,setShowAdmin]=useState(true)
+  const [showAdmin,setShowAdmin]=useState(false)
   const [contNotifications, setContNotifications] = useState(0)
+  const [services,setServices]=useState<any[]>([])
    const handleLogin = async (e: React.FormEvent) => {
       e.preventDefault()
       setError("")
@@ -123,6 +131,11 @@ export default function AdminDashboard() {
           setError(data.message)
           toast.error(data.message)
         }
+         const res1 = await fetch('/api/service/get')
+        const data1 = await res1.json()
+        if(res1.ok){
+          setServices(data1.services)
+        }
       } catch (error) {
         console.error(error)
         setError('Internal Server Error')
@@ -147,25 +160,43 @@ export default function AdminDashboard() {
     (blogPage - 1) * blogsPerPage,
     blogPage * blogsPerPage
   )
-  const handleImageUpload = (file: Blob | undefined, type: string) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const result = e.target?.result
-      if (typeof result === "string" && result) {
-        if (type === "course") {
-          setNewCourse({ ...newCourse, photo: result })
-        } else {
-          setNewBlog({ ...newBlog, image: result })
-        }
-      }
-    }
-    if (file) reader.readAsDataURL(file)
+  const handleImageUpload =async (file: Blob | undefined, type: string) => {
+      if(!file) return
+      const formData = new FormData()
+  formData.append("file", file)
+
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  })
+
+  if (!res.ok) {
+    console.error("Upload failed")
+    return
   }
+
+  const data = await res.json()
+  console.log("Uploaded to Cloudinary:", data.url)
+
+  // ✅ Save Cloudinary URL in state for database
+  if (type === "course") {
+    setNewCourse({ ...newCourse, photo: data.url })
+  } else {
+    setNewBlog({ ...newBlog, image: data.url })
+  }
+      
+    }
+    
+ 
   const handleAddCourse = async() => {
     // Add course logic here
-    setLoad(true)
+    
     try{
-      
+      if(!newCourse.description||!newCourse.duration||!newCourse.instructor||!newCourse.level||!newCourse.link||!newCourse.title||!newCourse.photo||!newCourse.maxUsers||!newCourse.startedAt){
+        toast.error("fill all the fields !!")
+        return
+      }
+      setLoad(true)
       console.log("Adding course:", newCourse)
       const res = await fetch('/api/courses/createCourse', {
         method: 'POST',
@@ -176,6 +207,19 @@ export default function AdminDashboard() {
       })
       if (res.ok) {
         const data = await res.json()
+        const notification = await fetch(`/api/notUSer/send`, {
+        method: "POST",
+        body: JSON.stringify({ type:"تم اضافة دورة جديدة",note:"course"}),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      if(notification.ok){
+        toast.success("send notification succefully")
+      }else{
+        toast.error("somthing wrong in notification")
+      }
+           
         setCourses([...courses, data])
         setNewCourse({
           title: "",
@@ -186,8 +230,12 @@ export default function AdminDashboard() {
           duration: "",
           photo: "",
           link:"",
-          description:""
+          description:"",
+          tags: [] as string[],
+          maxUsers:0,
+          startedAt: "",
         })
+
           toast.success("تمت إضافة الدورة بنجاح")
       } else {
         const error = await res.json()
@@ -214,6 +262,18 @@ export default function AdminDashboard() {
         body: JSON.stringify(newBlog),
       })
       if (res.ok) {
+         const notification = await fetch(`/api/notUSer/send`, {
+        method: "POST",
+        body: JSON.stringify({ type:"تم اضافة مقالة جديدة",note:"blog"}),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      if(notification.ok){
+        toast.success("send notification successfully")
+      }else{
+        toast.error("something wrong in notification")
+      }
         const data = await res.json()
         setBlogs([...blogs, data])
         setNewBlog({
@@ -224,6 +284,7 @@ export default function AdminDashboard() {
           image: "",
           author:"",
           content:"",
+          tags:[] as string[]
         })
         toast.success("تمت إضافة المدونة بنجاح")
       } else {
@@ -308,6 +369,7 @@ export default function AdminDashboard() {
             image: editingBlog.image,
             status: editingBlog.status,
             content: editingBlog.description,
+            tags:editingBlog.tags
           }),
         })
 
@@ -321,7 +383,8 @@ export default function AdminDashboard() {
     status: "مسودة",
     image: "",
     content:"",
-    author:""
+    author:"",
+    tags:[] as string[]
           })
           setShowBlogForm(false)
           toast.success("تم تحديث المدونة بنجاح")
@@ -349,6 +412,10 @@ export default function AdminDashboard() {
             price: editingCourse.price,
             duration: editingCourse.duration,
             level: editingCourse.level,
+            tags:editingCourse.tags,
+            maxUsers:editingCourse.maxUsers,
+            startedAt:editingCourse.startedAt
+
           }),
         })
 
@@ -357,8 +424,7 @@ export default function AdminDashboard() {
             courses.map((c) => (c.id === editingCourse.id ? { ...editingCourse, photo: editingCourse.photo } : c)),
           )
           setEditingCourse({
-             id:0,
-      title: "",
+             title: "",
     level: "مبتدئ",
     price: 0,
     
@@ -367,6 +433,9 @@ export default function AdminDashboard() {
     photo: "",
     link: "",
     description: "",
+    tags: [] as string[],
+    maxUsers:0,
+    startedAt: new Date(),
           })
           setShowCourseForm(false)
           toast.success("تم تحديث الدورة بنجاح")
@@ -400,7 +469,27 @@ export default function AdminDashboard() {
   }
   setLoad(false)
 };
- 
+ const handleDeleteService=async(id:number)=>{
+  if (!confirm("هل أنت متأكد من حذف هذه الطلب")) return
+    
+  try{
+    const res=await fetch(`/api/service/delete/${id}`,{
+       method: "DELETE"
+    })
+      const data = await res.json()
+
+    if (res.ok) {
+      setServices((prev) => prev.filter((n) => n.id !== id))
+      toast.success("تم حذف الطلب بنجاح")
+    } else {
+      console.error("Error deleting service:", data.error)
+      toast.error("حدث مشكل")
+    }
+  }catch(err){
+    console.log(err);
+    toast.error("Error in delete service")
+  }
+ }
  
   const handleDeleteNotification = async (id: number) => {
   if (!confirm("هل أنت متأكد من حذف هذه الملاحظة؟")) return
@@ -421,6 +510,45 @@ export default function AdminDashboard() {
     toast.error("حدث مشكل")
   }
   setLoad(false)
+}
+const deleteUser = async (userId: number) => {
+   const confirmed = confirm("هل أنت متأكد أنك تريد حذف هذا المستخدم؟");
+  if (!confirmed) return;
+  try {
+    const res = await fetch(`/api/courses/${selectedCourseId}/users/${userId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to delete user");
+    }
+
+    // Update UI instantly
+    setCourseUsers((prev) => prev.filter((user) => user.id !== userId));
+    toast.success("تم حذف المستخدم من الدورة بنجاح");
+  } catch (error) {
+    console.error(error);
+    toast.error("حدث خطأ أثناء حذف المستخدم");
+  }
+};
+
+
+const [courseUsers, setCourseUsers] = useState<any[]>([])
+const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null)
+const [showUsers, setShowUsers] = useState(false)
+
+const handleUserCourse1 = async (courseId: number) => {
+  try {
+    const res = await fetch(`/api/courses/${courseId}`)
+    if (!res.ok) throw new Error(`HTTP error! ${res.status}`)
+    const data = await res.json()
+
+    setCourseUsers(data.users ?? [])
+    setSelectedCourseId(courseId)
+    setShowUsers(true)
+  } catch (error) {
+    console.error("Failed to fetch users:", error)
+  }
 }
 
   if (loading) {
@@ -636,10 +764,11 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="dashboard">إدارة الدورات</TabsTrigger>
             <TabsTrigger value="blogs">إدارة المدونة</TabsTrigger>
             <TabsTrigger value="feedback">الملاحظات</TabsTrigger>
+            <TabsTrigger value="service-request">طلبات الخدمة</TabsTrigger>
           </TabsList>
 
           {/* Courses Tab */}
@@ -658,7 +787,7 @@ export default function AdminDashboard() {
             {showCourseForm && (
               <Card className="p-6 border-primary/20 bg-primary/5">
                 <div className="space-y-4">
-                  <div>
+                   <div>
                     <label className="block text-sm font-medium mb-2">صورة الدورة</label>
                     <div className="border-2 border-dashed border-border rounded-lg p-4 hover:border-primary transition cursor-pointer">
                       <input
@@ -672,7 +801,7 @@ export default function AdminDashboard() {
                         <ImageIcon className="w-8 h-8 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">انقر لتحميل صورة الدورة</span>
                       </label>
-                      {newCourse.photo || editingCourse?.photo  && (
+                      {( newCourse.photo || editingCourse?.photo ) && (
                         <img
                           src={newCourse.photo || editingCourse?.photo || "/placeholder.svg"}
                           alt="Preview"
@@ -801,6 +930,60 @@ export default function AdminDashboard() {
                       placeholder="مثال: 6 أسابيع"
                     />
                   </div>
+                  <div>
+    <label className="block text-sm font-medium mb-2">الوسوم (Tags)</label>
+    <input
+      type="text"
+     value={(editingCourse?.tags || newCourse.tags).join(", ")}
+  onChange={(e) => {
+    const tagsArray = e.target.value.split(",").map(tag => tag.trim()) ;
+
+    if (editingCourse) {
+      setEditingCourse({ ...editingCourse, tags: tagsArray });
+    } else {
+      setNewCourse({ ...newCourse, tags: tagsArray });
+    }
+  }}
+      className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+      placeholder="مثال: برمجة, جافاسكريبت, تطوير ويب"
+    />
+    <p className="text-xs text-gray-500 mt-1">افصل الوسوم بفواصل (,)</p>
+  </div>
+
+  <div className="grid grid-cols-2 gap-4">
+    <div>
+      <label className="block text-sm font-medium mb-2">تاريخ البداية</label>
+      <input
+        type="date"
+        value={editingCourse?.startedAt || newCourse.startedAt}
+        onChange={(e) => {
+          if (editingCourse) {
+            setEditingCourse({ ...editingCourse, startedAt: e.target.value });
+          } else {
+            setNewCourse({ ...newCourse, startedAt: e.target.value });
+          }
+        }}
+        className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+      />
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium mb-2">الحد الأقصى للمشاركين</label>
+      <input
+        type="number"
+        value={editingCourse?.maxUsers || newCourse.maxUsers}
+        onChange={(e) => {
+          if (editingCourse) {
+            setEditingCourse({ ...editingCourse, maxUsers: Number(e.target.value) });
+          } else {
+            setNewCourse({ ...newCourse, maxUsers: Number(e.target.value) });
+          }
+        }}
+        className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+        placeholder="عدد المشاركين الأقصى"
+      />
+    </div>
+  </div>
                   <div className="flex gap-2">
                     <Button
                       onClick={editingCourse ? () => handleUpdateCourse(editingCourse.id) : handleAddCourse}
@@ -824,9 +1007,9 @@ export default function AdminDashboard() {
               {paginatedCourses.map((course) => (
                 <Card key={course.id} className="overflow-hidden hover:shadow-lg transition">
                   <div className="h-40 overflow-hidden bg-muted">
-                    {course.image && (
+                    {course.photo && (
                       <img
-                        src={course.image || "/placeholder.svg"}
+                        src={course.photo || "/placeholder.svg"}
                         alt={course.title}
                         className="w-full h-full object-cover"
                       />
@@ -851,14 +1034,14 @@ export default function AdminDashboard() {
                         <span className="text-muted-foreground">السعر:</span>
                         <p className="font-medium text-primary">{course.price} DA</p>
                       </div>
-                      <div>
-                        <span className="text-muted-foreground">الطلاب:</span>
-                        <p className="font-medium">{course.students}</p>
-                      </div>
+                     
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" className="flex-1 gap-2 bg-transparent" onClick={()=>handleUpdateCourse1(course.id as number)}>
                         <Edit2 className="w-4 h-4" /> تعديل
+                      </Button>
+                      <Button size="sm" variant="outline" className="flex-1 gap-2 bg-transparent" onClick={()=>handleUserCourse1(course.id as number)}>
+                        <User className="w-4 h-4" /> المشاركين
                       </Button>
                       <Button
                         size="sm"
@@ -866,6 +1049,8 @@ export default function AdminDashboard() {
                         className="text-red-600 hover:text-red-700 bg-transparent"
                         onClick={() => handleDeleteCourse(course.id)}
                       >
+                        
+
                         {
                           load?(
                             <Loader2 className="w-4 h-4 animate-spin text-black" />
@@ -1063,6 +1248,25 @@ export default function AdminDashboard() {
                         <option value="مؤرشف">مؤرشف</option>
                       </select>
                     </div>
+                    <div>
+    <label className="block text-sm font-medium mb-2">الوسوم (Tags)</label>
+    <input
+      type="text"
+     value={(editingBlog?.tags || newBlog.tags).join(", ")}
+  onChange={(e) => {
+    const tagsArray = e.target.value.split(",").map(tag => tag.trim()) ;
+
+    if (editingBlog) {
+      setEditingBlog({ ...editingBlog, tags: tagsArray });
+    } else {
+      setNewBlog({ ...newBlog, tags: tagsArray });
+    }
+  }}
+      className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+      placeholder="مثال: برمجة, جافاسكريبت, تطوير ويب"
+    />
+    <p className="text-xs text-gray-500 mt-1">افصل الوسوم بفواصل (,)</p>
+  </div>
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -1222,8 +1426,94 @@ export default function AdminDashboard() {
               )}
             </div>
           </TabsContent>
+          <TabsContent value="service-request" className="space-y-6">
+            <h2 className="text-2xl font-bold">آخر طلبات خدمة </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {services.length === 0 ? (
+                <p className="text-muted-foreground">لا توجد طلبات حالياً</p>
+              ) : (
+                services.map((service) => (
+                  <Card
+                    key={service.id}
+                    className={`p-6 border-l-4 `}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex gap-4">
+                     
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-2">{service.fullName}</h3>
+                        <p className="text-sm text-muted-foreground mb-3">{service.message}</p>
+                        <p className="text-sm text-muted-foreground mb-3">{service.phone}</p>
+                        <p className="text-sm text-muted-foreground mb-3">{service.email}</p>
+                        <div className="flex gap-2">
+                         
+                          <span className="text-sm">{new Date(service.createdAt).toLocaleDateString('en-GB', {
+      day: '2-digit',
+     
+      year: 'numeric', month: '2-digit',
+    })}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-red-600 hover:text-red-700 bg-transparent"
+                        onClick={() => handleDeleteService(service.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
+      {showUsers && (
+  <div
+          className="fixed inset-0 z-10 flex items-center justify-center bg-gray-700/50 bg-opacity-[90%]"
+          onClick={() => setShowUsers(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-lg relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-2 right-3 text-gray-500 hover:text-black text-lg"
+              onClick={() => setShowUsers(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-semibold mb-4 text-center">قائمة المشاركين</h2>
+
+            {courseUsers.length === 0 ? (
+              <p className="text-gray-600 text-center">لا يوجد مشاركون في هذه الدورة.</p>
+            ) : (
+              <ul className="divide-y divide-gray-200">
+                {courseUsers.map((user) => (
+                  <li key={user.id} className="py-2 px-2 flex justify-between w-full">
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-900">{`${user.firstName} ${user.lastName}` || "مستخدم مجهول"}</span>
+                      <span className="text-sm text-gray-500">{user.email}</span>
+                    </div>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-red-600 hover:text-red-700 bg-transparent"
+                        onClick={() => deleteUser(user.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+)}
     </div>
   )
 }

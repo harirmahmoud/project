@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 
-export async function POST(req: { json: () => PromiseLike<{ title: any; description: any; instructor: any; photo: any; price: any; link: any; duration: any; level: any; }> | { title: any; description: any; instructor: any; photo: any; price: any; link: any; duration: any; level: any; }; }) {
+export async function POST(req: { json: () => PromiseLike<{ startedAt:any;title: any; description: any; instructor: any; photo: any; price: any; link: any; duration: any; level: any; maxUsers: any; tags: any[] }> | {startedAt:any; title: any; description: any; instructor: any; photo: any; price: any; link: any; duration: any; level: any; maxUsers: any; tags: any[] }; }) {
   try {
     const {
       title,
@@ -13,6 +13,9 @@ export async function POST(req: { json: () => PromiseLike<{ title: any; descript
       link,
       duration,
       level,
+      maxUsers,
+      tags,
+      startedAt
     } = await req.json();
 
     // ✅ Validate required fields
@@ -28,9 +31,23 @@ export async function POST(req: { json: () => PromiseLike<{ title: any; descript
     if (isNaN(parsedPrice)) {
       return NextResponse.json({ error: "Price must be a number" }, { status: 400 });
     }
+    tags.forEach(async tag => {
+      if (typeof tag !== 'string') {
+        throw new Error('Each tag must be a string');
+      }else{
+        try{
+          await prisma.tag.create({
+            data: {
+              name: tag
+            }
+          }); 
+       }catch(err){}
+      }
+    });
+    
 
     // ✅ Create the course
-    const newCourse = await prisma.course.create({
+     const newCourse = await prisma.course.create({
       data: {
         title: String(title),
         description: String(description),
@@ -40,6 +57,14 @@ export async function POST(req: { json: () => PromiseLike<{ title: any; descript
         link: String(link),
         duration: String(duration),
         level: String(level),
+        maxUsers: ( maxUsers !== undefined && maxUsers !== null) ? Number(maxUsers) : 0,
+        startedAt: new Date(startedAt),
+        Tags: { // <-- use the exact relation field name
+      connectOrCreate: tags.map((tagName) => ({
+        where: { name: tagName },
+        create: { name: tagName },
+      })),
+    },
       },
     });
 

@@ -10,13 +10,22 @@ import Chatbot from "@/components/chatbot"
 // UI components from shadcn/ui
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"
-import { ChevronRight, ChevronLeft, Search } from 'lucide-react'
+import { Card, CardContent } from "@/components/ui/card"
+import { ChevronRight, ChevronLeft, Search, User, Clock, Calendar, Tags } from 'lucide-react'
 import Link from "next/link"
+import { title } from "process"
+import { translations } from "@/lib/translations"
 
 const categories = ["الكل", "الأمان السيبراني", "الحماية الرقمية", "تكنولوجيا المعلومات"]
 
 export default function BlogsPage() {
+   const [language, setLanguage] = useState<string>("ar")
+          
+            useEffect(() => {
+              const savedLang = localStorage.getItem("language") || "ar"
+              setLanguage(savedLang)
+            }, [])
+             const t = translations[language as keyof typeof translations]
   const [selectedCategory, setSelectedCategory] = useState("الكل")
   const [searchQuery, setSearchQuery] = useState("")
   const [blogs, setBlogs] = useState<Blog[]>([])
@@ -57,9 +66,9 @@ export default function BlogsPage() {
       {/* ... existing hero section ... */}
       <section className="bg-primary text-primary-foreground py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">مدونتنا</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t.blogHead}</h1>
           <p className="text-lg text-primary-foreground/90 max-w-2xl mx-auto">
-            اكتشف أحدث المقالات والأفكار حول الأمن السيبراني والحماية الرقمية
+            {t.blogmain}
           </p>
         </div>
       </section>
@@ -71,7 +80,7 @@ export default function BlogsPage() {
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <input
               type="text"
-              placeholder="ابحث عن المقالات..."
+              placeholder={t.searchblog}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value)
@@ -97,7 +106,15 @@ export default function BlogsPage() {
                 variant={selectedCategory === category ? "default" : "outline"}
                 className={selectedCategory === category ? "bg-primary" : ""}
               >
-                {category}
+                {category=="تكنولوجيا المعلومات"?(
+                  <span>{t.informationtechnology}</span>
+                ):category=="الحماية الرقمية"?(
+                  <span>{t.informationtechnology}</span>
+                ):category=="الكل"?(
+                  <span>{t.all}</span>
+                ):(
+                  <span>{t.Cybersecurity}</span>
+                )}
               </Button>
             ))}
           </div>
@@ -109,45 +126,69 @@ export default function BlogsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">جاري التحميل...</p>
+              <p className="text-muted-foreground">{t.loading}</p>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {blogs.map((post) => (
-                  <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="h-48 overflow-hidden bg-muted">
-                      <img
-                        src={post.image || "/placeholder.svg"}
-                        alt={post.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                          {post.category}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(post.createdAt).toLocaleDateString("ar-SA")}
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-bold mb-2 text-foreground hover:text-primary transition">
-                        {post.title}
-                      </h3>
-                      <p className="text-muted-foreground mb-4 line-clamp-3">{post.description}</p>
-                      <Link href={`/blogs/${post.id}`}>
-                      <Button
-                        variant="outline"
-                        className="w-full text-primary border-primary hover:bg-primary/10 bg-transparent"
+                  <Card key={post.id} className="overflow-hidden rounded-xl border shadow-sm hover:shadow-md transition-all duration-300 w-full max-w-md">
+      {/* Image Section */}
+      <div className="relative h-48">
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-full object-cover transition-transform hover:scale-105"
+        />
+        <Badge className="absolute top-3 left-3 bg-emerald-700 text-white px-3 py-1 text-xs font-semibold">
+          {post.category}
+        </Badge>
+      </div>
 
-                      >
-                        اقرأ المزيد →
-                      </Button>
-                      </Link>
-                      
-                    </div>
-                  </Card>
+      {/* Content */}
+      <CardContent className="p-5 space-y-3">
+        <h3 className="text-lg font-bold text-gray-800 leading-snug">
+          {post.title}
+        </h3>
+        <p className="text-gray-600 text-sm">{post.description}</p>
+
+        {/* Date & Author */}
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <div className="flex items-center gap-1">
+            <Calendar size={14} />
+            <span>{new Date(post.createdAt).toLocaleDateString('en-GB', {
+      day: '2-digit',
+     
+      year: 'numeric', month: '2-digit',
+    })}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <User size={14} />
+            <span>{post.author}</span>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {post.tags.map((tag, i) => (
+            <span
+              key={i}
+              className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs flex gap-2"
+            >
+              <Tags className="text-gray h-3 w-3"/>
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Button */}
+        <Link href={`/blogs/${post.id}`}>
+          <Button className="w-full mt-3 bg-green-700 hover:bg-green-800 text-white font-medium rounded-full">
+                {t.ReadArticle}
+          </Button>
+        </Link>
+      </CardContent>
+    </Card>
                 ))}
               </div>
 
@@ -169,7 +210,7 @@ export default function BlogsPage() {
                     className="gap-2"
                   >
                     <ChevronRight className="w-4 h-4" />
-                    السابق
+                    {t.previous}
                   </Button>
 
                   <div className="flex gap-1">

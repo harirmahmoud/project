@@ -23,14 +23,14 @@ export async function GET() {
 
     // 3️⃣ Fetch recent courses and blogs for dashboard display
     const courses = await prisma.course.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 5,
+      orderBy: { startedAt: "desc" },
+      take: 10,
       include: { Users: true },
     });
 
     const blogs = await prisma.blog.findMany({
       orderBy: { createdAt: "desc" },
-      take: 5,
+      take: 10,
       include: { Users: true },
     });
 
@@ -41,8 +41,12 @@ export async function GET() {
     })
     const notification=await prisma.notification.findMany({
       orderBy:{createdAt:"desc"},
-      take:5,
+      take:10,
      
+    })
+    const service=await prisma.service.findMany({
+      orderBy:{createdAt:"desc"},
+      take:10,
     })
 
     return NextResponse.json({
@@ -55,6 +59,7 @@ export async function GET() {
       unreadCount,
       notification,
       unnotification,
+      service,
     });
   } catch (error) {
     console.error("Error fetching dashboard data:", error);

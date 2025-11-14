@@ -33,6 +33,10 @@ export interface Course {
   duration: string
   level: string
   instructor?: string
+  startedAt: Date
+  countUsers: number
+  maxUsers: number
+  tags: string[]
   createdAt: Date
   
 }
@@ -55,6 +59,7 @@ export interface Blog {
   category: string
   image?: string
   createdAt: Date
+  tags: string[]
 }
 
 export interface BlogsResponse {

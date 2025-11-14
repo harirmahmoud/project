@@ -27,24 +27,7 @@ export default function Hero() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              variant="outline"
-              className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
-            >{t.hero3}
-            </Button>
-            <Button
-              variant="outline"
-              className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
-            >{t.hero4}
-            </Button>
-            <Button
-              variant="outline"
-              className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
-            >
-              {t.hero5}
-            </Button>
-          </div>
+         
         </div>
       </div>
     </section>

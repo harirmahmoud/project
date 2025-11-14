@@ -5,14 +5,15 @@ import { useState, useEffect } from "react"
 import type { Course, ApiResponse } from "@/lib/type" // Assuming these types are declared somewhere
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"// Assuming these components are declared somewhere
-import { Search, ChevronRight, ChevronLeft, Loader2 } from "lucide-react" // Assuming these icons are declared somewhere
+import { Card, CardContent } from "@/components/ui/card"// Assuming these components are declared somewhere
+import { Search, ChevronRight, ChevronLeft, Loader2, Star, User, Tag } from "lucide-react" // Assuming these icons are declared somewhere
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import Chatbot from "@/components/chatbot"// Assuming Chatbot component is declared somewhere
 import { useUser } from "@clerk/nextjs"
 import { toast } from "react-toastify"
 import { translations } from "@/lib/translations"
+import { Progress } from "@/components/ui/progress"
 
 const categories = ["الكل", "مبتدئ", "متوسط", "متقدم"] // Assuming categories are defined somewhere
 
@@ -32,6 +33,7 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true)
   const [isBuy, setIsBuy] = useState<number[]>([])
   const [load,setLoad]=useState(false)
+  const [buy,setBuy]=useState(false)
   
   const user = useUser()
 
@@ -102,16 +104,17 @@ export default function CoursesPage() {
     
     setLoad(false);
   }
+
   return (
     <main className="min-h-screen bg-background">
       <Header />
-
+      
       {/* ... existing hero section ... */}
       <section className="bg-primary text-primary-foreground py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t.course1}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t.coursehead}</h1>
           <p className="text-lg text-primary-foreground/90 max-w-2xl mx-auto">
-           {t.course2}
+           {t.corsemain}
           </p>
         </div>
       </section>
@@ -123,7 +126,7 @@ export default function CoursesPage() {
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <input
               type="text"
-              placeholder={t.course3}
+              placeholder={t.searchcourse}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value)
@@ -149,7 +152,7 @@ export default function CoursesPage() {
                 variant={selectedCategory === category ? "default" : "outline"}
                 className={selectedCategory === category ? "bg-primary" : ""}
               >
-                {category === "الكل" ? t.categories[0] : category==="مبتدئ"? t.categories[1]:category==="متوسط"? t.categories[2]:t.categories[3]}
+                {category === "الكل" ? t.all : category==="مبتدئ"? t.beginner:category==="متوسط"? t.middle:t.Expert}
               </Button>
             ))}
           </div>
@@ -161,53 +164,96 @@ export default function CoursesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">{t.course4}</p>
+              <p className="text-muted-foreground">{t.loading}</p>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 
                 {courses.map((course) => (
-                  <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
-                    <div className="h-48 overflow-hidden bg-muted relative">
-                      <img
-                        src={course.photo || "/placeholder.svg"}
-                        alt={course.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform"
-                      />
-                      <div className="absolute top-3 right-3">
-                        <Badge className="bg-primary text-primary-foreground">{course.level === "الكل" ? t.categories[0] : course.level==="مبتدئ"? t.categories[1]:course.level==="متوسط"? t.categories[2]:t.categories[3]}</Badge>
-                      </div>
-                    </div>
-                    <div className="p-6 flex flex-col flex-grow">
-                      <div className="flex items-center gap-2 mb-3 flex-wrap">
-                        <span className="text-sm text-muted-foreground">{course.duration}</span>
-                        <span className="text-sm text-muted-foreground">👨‍🏫 {course.instructor}</span>
-                      </div>
-                      <h3 className="text-xl font-bold mb-2 text-foreground hover:text-primary transition">
-                        {course.title}
-                      </h3>
-                      <p className="text-muted-foreground mb-4 line-clamp-2 flex-grow">{course.description}</p>
-                      <div className="flex items-center justify-between mb-4 pt-4 border-t border-border">
-                        <span className="font-bold text-primary">
-                          {course.price === 0 ? t.course11 : `${course.price} DA`}
-                        </span>
-                      </div>
-                      <Button onClick={()=>{isBuy.includes(course.id) ? null : handleBuy(course.id)}} className={isBuy.includes(course.id) ?"w-full bg-primary hover:bg-primary/90 text-primary-foreground":"w-full"} disabled={isBuy.includes(course.id)}>
-                        {load ?(
-                          <Loader2 className="w-4 h-4 animate-spin text-black" />
-                        ) : (
-                          isBuy.includes(course.id) ? t.course5 : t.course6
-                        )}
-                      </Button>
-                    </div>
-                  </Card>
+                   <Card key={course.id} dir="rtl" className="w-full max-w-3xl mx-auto shadow-md rounded-2xl overflow-hidden border">
+      <img
+        src={course.photo}
+        alt="صورة الدورة"
+        className="w-full h-48 object-cover"
+      />
+
+      <CardContent className="p-4">
+        {/* Title & Description */}
+        <h2 className="text-xl font-bold text-gray-800 mb-1">
+          {course.title}
+        </h2>
+        <p className="text-gray-600 text-sm mb-3">
+          {course.description}
+        </p>
+
+        {/* Instructor + Rating */}
+        <div className="flex justify-between text-sm text-gray-700 mb-3">
+          <div className="flex gap-2">
+            <User className="h-4 w-4 text-gray-500"/>
+            <span>{course.instructor}</span>
+          </div>
+          
+          
+          <span className="text-gray-500">{course.maxUsers} / {course.countUsers}</span>
+        </div>
+
+        {/* Progress Bar */}
+        <Progress value={course.countUsers/course.maxUsers * 100} className="mb-3 h-2 bg-gray-200" />
+
+        {/* Tags */}
+        {
+          course.tags && course.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {course.tags.map((tag, index) => (
+
+                <span
+                  key={index}
+                  className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium flex gap-2"
+                >{tag}
+                  <Tag className="h-3 w-3 text-green-800"/>
+                  
+                </span>
+              ))}
+            </div>
+          )
+        }
+      
+
+        {/* Footer Info */}
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-gray-600 text-sm">
+              تاريخ البدء: <span className="font-medium">{new Date(course.startedAt).toLocaleDateString('ar-DZ', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })}</span>
+            </p>
+            <p className="text-gray-600 text-sm">
+              المدة: <span className="font-medium">{course.duration}</span>
+            </p>
+          </div>
+
+          <div className="text-right">
+            <p className="text-green-700 font-bold text-lg">{course.price} د.ج</p>
+            <p className="text-xs text-gray-500">شامل جميع الضرائب</p>
+          </div>
+        </div>
+
+        {/* Enroll Button */}
+        <Button onClick={() => handleBuy(course.id)} className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white rounded-full text-base py-2">
+         {t.buycourse}
+        </Button>
+      </CardContent>
+    </Card>
                 ))}
               </div>
 
               {courses.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-lg text-muted-foreground">
-                    {searchQuery ? t.course7 : t.course8}
+                    {t.nocourse}
                   </p>
                 </div>
               )}
@@ -222,7 +268,7 @@ export default function CoursesPage() {
                     className="gap-2"
                   >
                     <ChevronRight className="w-4 h-4" />
-                    {t.course9}
+                    {t.next}
                   </Button>
 
                   <div className="flex gap-1">
@@ -246,7 +292,7 @@ export default function CoursesPage() {
                     disabled={currentPage === totalPages}
                     className="gap-2"
                   >
-                    {t.course10}
+                    {t.previous}
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
                 </div>

@@ -16,7 +16,7 @@ model User {
   lastName     String
   password     String?
   createdAt    DateTime       @default(now())
-  
+  phone       Int?
   Blogs        Blog[]         @relation("UserBlogs")
   Courses      Course[]       @relation("UserCourses")
 }
@@ -30,9 +30,12 @@ model Course {
   link        String
   duration    String
   instructor  String?
-  createdAt   DateTime @default(now())
+  startedAt   DateTime 
   level       String
+  Tags        Tag[]    @relation("CourseTags")
   Users       User[]   @relation("UserCourses")
+   maxUsers   Int
+  evaluation  Float?
 }
 
 model Blog {
@@ -46,11 +49,15 @@ model Blog {
   status      String
   image       String   @db.Text
   Users       User[]   @relation("UserBlogs")
+  Tags        Tag[]    @relation("BlogTags")
+ 
 }
 
 model Notification {
   id        Int      @id @default(autoincrement())
   message   String?
+  description String?
+  fullName  String
   type      String
   email     String
   isRead    Boolean  @default(false)
@@ -63,4 +70,29 @@ model Admin {
   username  String   @unique
   password  String
   createdAt DateTime @default(now())
+}
+model Tag {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+   Blogs        Blog[]         @relation("BlogTags")
+  Courses      Course[]       @relation("CourseTags")
+}
+model UserNote {
+  id        Int      @id @default(autoincrement())
+  type      String
+  note      String   @db.Text
+  createdAt DateTime @default(now())
+
+}
+model Service {
+  id          Int      @id @default(autoincrement())
+  fullName    String
+  email       String
+  phone       String
+  company    String
+  type       String
+  description String   @db.Text
+  level      String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
 }

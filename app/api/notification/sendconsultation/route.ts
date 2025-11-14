@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma"
 
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json()
+    const { email,fullName,message,description } = await req.json()
 
-    if (!email  ){
+    if (!email || !fullName ||!message||!description  ){
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -14,11 +14,15 @@ export async function POST(req: Request) {
 
     const notification = await prisma.notification.create({
       data: {
-        message: "طلب استشارة جديد",
+        message: message,
         type:"consultation",
         email,
+        isRead:false,
+        fullName,
+        description
       },
     })
+    
 
     return NextResponse.json({ success: true, notification }, { status: 201 })
   } catch (error: any) {

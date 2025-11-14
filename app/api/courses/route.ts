@@ -41,6 +41,12 @@ export async function POST(req: Request) {
       skip,
       take: limit,
       orderBy: { id: "desc" },
+       include: {
+        _count: {
+          select: { Users: true }, // counts how many users are enrolled
+        },
+        Tags: { select: { name: true } },
+      },
     })
     const isBuyedCoursesIdsRaw  = await prisma.course.findMany({
       where: {
@@ -53,10 +59,15 @@ export async function POST(req: Request) {
     const isBuyedCoursesIds = isBuyedCoursesIdsRaw.map((course) => course.id);
     console.log("✅ User bought courses IDs:", isBuyedCoursesIds)
     const totalPages = Math.ceil(total / limit)
+    const formattedCourses = courses.map((course) => ({
+      ...course,
+      countUsers: course._count.Users,
+      tags: course.Tags.map((tag) => tag.name),
+    }));
 
     return NextResponse.json({
       success: true,
-      courses,
+      courses:formattedCourses,
       total,
       page,
       totalPages,

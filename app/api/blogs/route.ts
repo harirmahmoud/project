@@ -35,13 +35,20 @@ export async function GET(req: Request) {
       skip,
       take: limit,
       orderBy: { id: "desc" },
+       include: { 
+        Tags: { select: { name: true } },
+      },
     })
-
+    const formattedBlogs = blogs.map((blog) => ({
+      ...blog,
+      tags: blog.Tags.map((tag) => tag.name),
+      
+    }));
     const totalPages = Math.ceil(total / limit)
 
     return NextResponse.json({
       success: true,
-      blogs,
+      blogs: formattedBlogs,
       total,
       page,
       totalPages,
