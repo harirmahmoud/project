@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { X, Send, MessageCircle } from "lucide-react"
 import axios from "axios"
+import { translations } from "@/lib/translations"
 
 interface Message {
   id: string
@@ -15,6 +16,13 @@ interface ChatMessage {
   stl: boolean;
 }
 export default function Chatbot() {
+            const [language, setLanguage] = useState<string>("ar")
+        
+          useEffect(() => {
+            const savedLang = localStorage.getItem("language") || "ar"
+            setLanguage(savedLang)
+          }, [])
+           const t = translations[language as keyof typeof translations]
   const [isOpen, setIsOpen] = useState(false)
   const apiKey=process.env.NEXT_PUBLIC_GROQ_API_KEY;
   const [chat, setChat] = useState<ChatMessage[]>([]);
@@ -116,7 +124,7 @@ export default function Chatbot() {
         <div className="fixed bottom-6 right-6 w-96 max-h-[600px] bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden z-50">
           {/* Header */}
           <div className="bg-[#1B5E20] text-white px-6 py-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold">CyberGuard Assistant</h3>
+            <h3 className="text-lg font-semibold">{t.chatbot}</h3>
             <button
               onClick={() => setIsOpen(false)}
               className="text-white hover:bg-[#0D3B15] p-1 rounded transition-colors"
@@ -156,7 +164,7 @@ export default function Chatbot() {
 
           {/* Input Area */}
           <div className="border-t border-gray-200 p-4 space-y-2">
-            <p className="text-xs text-gray-500 text-center">Ask about cybersecurity</p>
+            <p className="text-xs text-gray-500 text-center">{t.askch}</p>
             <div className="flex gap-2">
               <input
                 type="text"

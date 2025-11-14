@@ -14,28 +14,7 @@ import { Card, CardContent } from "./ui/card"
 
 export default function Header() {
   const [aiform,setAiform]=useState(false)
-  const ainot = [
-{
-title: "تهديد مباشر او اختراق",
-level: "عالي الخطورة",
-color: "bg-red-500",
-},
-{
-title: "تحديثات برمجية او تحديات",
-level: "متوسط",
-color: "bg-orange-500",
-},
-{
-title: "نصائح توعوية",
-level: "منخفض",
-color: "bg-green-500",
-},
-{
-title: "بلاغات تنظيمية او اعلانات",
-level: "عام",
-color: "bg-blue-500",
-},
-];
+ 
  type NotificationType = {
     id: string
     note?: string
@@ -80,7 +59,28 @@ color: "bg-blue-500",
       const handleClose = () => {
           setOpen(false)
       }
-   
+    const ainot = [
+{
+title:t.ai[0].title ,
+level: t.ai[0].level,
+color: "bg-red-500",
+},
+{
+title: t.ai[1].title,
+level: t.ai[1].level,
+color: "bg-orange-500",
+},
+{
+title: t.ai[2].title,
+level: t.ai[2].level,
+color: "bg-green-500",
+},
+{
+title: t.ai[3].title,
+level: t.ai[3].level,
+color: "bg-blue-500",
+},
+];
   return (
     <header className="bg-white border-b border-border fixed top-0 w-full z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,7 +124,7 @@ color: "bg-blue-500",
           {/* CTA Button */}
           <LanguageSwitcher />
           <Link href={"/sign-in"}>
-           <Button className="bg-yellow-400 text-black hover:bg-yellow-500">البدء</Button>
+           <Button className="bg-yellow-400 text-black hover:bg-yellow-500">{t.start}</Button>
           </Link>
          <button
               onClick={() => setShowNotifications(!showNotifications)}
@@ -161,7 +161,7 @@ color: "bg-blue-500",
       {showNotifications && (
               <div className="absolute top-full right-0 mt-2 w-96 bg-card border border-border rounded-lg shadow-2xl z-50">
                 <div className="p-4 border-b border-border flex justify-between items-center">
-                  <h3 className="font-bold text-lg">الإشعارات</h3>
+                  <h3 className="font-bold text-lg">{t.notification}</h3>
                   <button
                     onClick={async() => {setShowNotifications(false);
                       try{
@@ -188,7 +188,7 @@ color: "bg-blue-500",
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.length === 0 ? (
                     <div className="p-6 text-center text-muted-foreground">
-                      <p>لا توجد إشعارات جديدة</p>
+                      <p>{t.desnote}</p>
                     </div>
                   ) : (
                     notifications.map((notification) => (
@@ -231,7 +231,7 @@ color: "bg-blue-500",
 <CardContent className="p-2">
 <div className="flex justify-between items-center mb-3">
 <span className="text-gray-500 text-sm">4</span>
-<span className="font-semibold text-gray-800">AI Notifications</span>
+<span className="font-semibold text-gray-800">{t.ainote}</span>
 </div>
 
 

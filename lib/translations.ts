@@ -145,8 +145,56 @@ export const translations = {
     desres:"وصف الخدمة المطلوبة ",
     desInput:"صف تفاصيل الخدمة التي تحتاجها",
     sendres:"إرسال الطلب",
+    notification:"الإشعارات",
+    ainote:"الإشعارات الذكية",
+    ai:[{
+      title: "تهديد مباشر او اختراق",
+      level: "عالي الخطورة",
+    },
+  {
+    title: "تحديثات برمجية او تحديات",
+level: "متوسط",
   },
+{
+  title: "نصائح توعوية",
+level: "منخفض",
+},
+{
+  title: "بلاغات تنظيمية او اعلانات",
+level: "عام",
+}
+],
+desnote:"لا توجد إشعارات جديدة",
+chatbot:"المستشار الذكي",
+askch:"اسأل عن الأمن السيبراني",
+  },
+  
   en: {
+    askch:"Ask about cybersecurity",
+    chatbot:"The smart advisor",
+    desnote:"No new notifications",
+    ai:[{
+title: "Direct Threat or Breach",
+
+level: "High Risk",
+},
+{
+title: "Software Updates or Challenges",
+
+level: "Medium",
+},
+{
+title: "Awareness Advice",
+
+level: "Low",
+},
+{
+title: "Regulatory Notices or Announcements",
+
+level: "General",
+}],
+    ainote:"Smart notifications",
+    notification:"Notifications",
     headser: "Service Request", mainser: "Please fill out the form below to request the service you need.", titleser: "Service Request Form",
     desres: "Describe the service requested",
 
