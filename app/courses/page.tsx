@@ -70,12 +70,16 @@ export default function CoursesPage() {
     fetchCourses()
   }, [currentPage, searchQuery, selectedCategory])
 
-  const handleBuy = async (id: number) => {
+  const handleBuy = async (course:any) => {
+    if(course.countUsers>=course.maxUsers){
+      toast.error("the course is full ")
+      return
+    }
     setLoad(true);
     // Implement the buy logic here
     const response = await fetch(`/api/courses/buyCourse`, {
       method: "POST",
-      body: JSON.stringify({ email: user.user?.emailAddresses[0].emailAddress, courseId: id }),
+      body: JSON.stringify({ email: user.user?.emailAddresses[0].emailAddress, courseId: course.id }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -83,7 +87,8 @@ export default function CoursesPage() {
     const data = await response.json()
     if (data.success) {
       toast.success("تم تسجيلك في الدورة بنجاح!")
-      setIsBuy((prev) => [...prev, id])
+      
+      setIsBuy((prev) => [...prev, course.id])
       const notification = await fetch(`/api/notification`, {
         method: "POST",
         body: JSON.stringify({ email: user.user?.emailAddresses[0].emailAddress, message: `لقد تم تسجيلك في دورة جديدة: ${data.courseTitle}` }),
@@ -242,8 +247,16 @@ export default function CoursesPage() {
         </div>
 
         {/* Enroll Button */}
-        <Button onClick={() => handleBuy(course.id)} className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white rounded-full text-base py-2">
-         {t.buycourse}
+        <Button onClick={() => handleBuy(course)} className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white rounded-full text-base py-2">
+          {
+            load?(
+              <Loader2 className="w-4 h-4 text-white animate-spin"/>
+            ):
+            <span>
+               {t.buycourse}
+            </span>
+          }
+        
         </Button>
       </CardContent>
     </Card>
