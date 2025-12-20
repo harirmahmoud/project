@@ -50,14 +50,21 @@ export async function POST(req: Request) {
     }
 
     // ✅ Link user to course
-    await prisma.course.update({
-      where: { id: Number(courseId) },
-      data: {
-        Users: {
-          connect: { email: email },
+   await prisma.course.update({
+  where: { id: Number(courseId) },
+  data: {
+    Users: {
+      connectOrCreate: {
+        where: { email: email },
+        create: {
+          email: email,
+          firstName: "",
+          lastName: "",
         },
       },
-    });
+    },
+  },
+});
 
     return NextResponse.json({
       success: true,

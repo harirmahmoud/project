@@ -19,6 +19,9 @@ const categories = ["الكل", "مبتدئ", "متوسط", "متقدم"] // Ass
 
 export default function CoursesPage() {
         const [language, setLanguage] = useState<string>("ar")
+       const [email, setEmail] = useState("");
+const [showEmailForm, setShowEmailForm] = useState(false);
+const [selectedCourse, setSelectedCourse] = useState<any>(null);
     
       useEffect(() => {
         const savedLang = localStorage.getItem("language") || "ar"
@@ -70,45 +73,62 @@ export default function CoursesPage() {
     fetchCourses()
   }, [currentPage, searchQuery, selectedCategory])
 
-  const handleBuy = async (course:any) => {
-    if(course.countUsers>=course.maxUsers){
-      toast.error("the course is full ")
-      return
-    }
-    setLoad(true);
-    // Implement the buy logic here
-    const response = await fetch(`/api/courses/buyCourse`, {
+ 
+
+  const handleBuy = async (course: any) => {
+  // 👉 If email is empty, show form and STOP
+  if (!email) {
+    setSelectedCourse(course);
+    setShowEmailForm(true);
+    return;
+  }
+
+  if (course.countUsers >= course.maxUsers) {
+    toast.error("the course is full");
+    return;
+  }
+
+  setLoad(true);
+
+  const response = await fetch(`/api/courses/buyCourse`, {
+    method: "POST",
+    body: JSON.stringify({ email, courseId: course.id }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+
+  if (data.success) {
+    toast.success("تم تسجيلك في الدورة بنجاح!");
+    setIsBuy((prev) => [...prev, course.id]);
+
+    const notification = await fetch(`/api/notification`, {
       method: "POST",
-      body: JSON.stringify({ email: user.user?.emailAddresses[0].emailAddress, courseId: course.id }),
+      body: JSON.stringify({
+        email: email,
+        message: `لقد تم تسجيلك في دورة جديدة: ${data.courseTitle}`,
+      }),
       headers: {
         "Content-Type": "application/json",
       },
-    })
-    const data = await response.json()
-    if (data.success) {
-      toast.success("تم تسجيلك في الدورة بنجاح!")
-      
-      setIsBuy((prev) => [...prev, course.id])
-      const notification = await fetch(`/api/notification`, {
-        method: "POST",
-        body: JSON.stringify({ email: user.user?.emailAddresses[0].emailAddress, message: `لقد تم تسجيلك في دورة جديدة: ${data.courseTitle}` }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      const notificationData = await notification.json()
-      if (notificationData.success) {
-        toast.success("تم إرسال إشعار التسجيل بنجاح!")
-      } else {
-        toast.error("فشل إرسال إشعار التسجيل.")
-      }
-    } else {
-      toast.error("فشل تسجيلك في الدورة.")
+    });
 
+    const notificationData = await notification.json();
+
+    if (notificationData.success) {
+      toast.success("تم إرسال إشعار التسجيل بنجاح!");
+    } else {
+      toast.error("فشل إرسال إشعار التسجيل.");
     }
-    
-    setLoad(false);
+  } else {
+    console.error("Failed to enroll in course:", data.message);
+    toast.error("فشل تسجيلك في الدورة.");
   }
+
+  setLoad(false);
+};
 
   return (
     <main className="min-h-screen bg-background">
@@ -262,6 +282,44 @@ export default function CoursesPage() {
     </Card>
                 ))}
               </div>
+               {showEmailForm && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl p-6 w-[90%] max-w-md">
+      <h2 className="text-lg font-semibold mb-4">
+        أدخل بريدك الإلكتروني
+      </h2>
+
+      <input
+        type="email"
+        placeholder="example@email.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full border rounded-lg px-3 py-2 mb-4"
+      />
+
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setShowEmailForm(false)}
+          className="px-4 py-2 border rounded-lg"
+        >
+          إلغاء
+        </button>
+
+        <button
+          disabled={!email}
+          onClick={() => {
+            setShowEmailForm(false);
+            handleBuy(selectedCourse); // 🔥 CONTINUE BUY
+          }}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
               {courses.length === 0 && (
                 <div className="text-center py-12">
