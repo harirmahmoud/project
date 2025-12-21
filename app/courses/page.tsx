@@ -286,7 +286,7 @@ const [selectedCourse, setSelectedCourse] = useState<any>(null);
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div className="bg-white rounded-xl p-6 w-[90%] max-w-md">
       <h2 className="text-lg font-semibold mb-4">
-        أدخل بريدك الإلكتروني
+       {t.email}
       </h2>
 
       <input
@@ -302,7 +302,7 @@ const [selectedCourse, setSelectedCourse] = useState<any>(null);
           onClick={() => setShowEmailForm(false)}
           className="px-4 py-2 border rounded-lg"
         >
-          إلغاء
+          {t.cancel}
         </button>
 
         <button
@@ -313,7 +313,7 @@ const [selectedCourse, setSelectedCourse] = useState<any>(null);
           }}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
         >
-          OK
+          {t.ok}
         </button>
       </div>
     </div>

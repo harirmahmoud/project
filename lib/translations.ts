@@ -1,5 +1,6 @@
 import Consultation from "@/components/consultation"
 import Solutions from "@/components/solution"
+import { ok } from "assert"
 import { stat } from "fs"
 
 export const translations = {
@@ -167,9 +168,25 @@ level: "عام",
 desnote:"لا توجد إشعارات جديدة",
 chatbot:"المستشار الذكي",
 askch:"اسأل عن الأمن السيبراني",
+cancel:"إلغاء",
+ok:"موافق",
+login:"تسجيل الدخول",
+password:"كلمة المرور",
+waitlogin:"جاري تسجيل الدخول...",
+passwordInput:"أدخل كلمة المرور",
+
+
+
   },
   
   en: {
+   
+    waitlogin:"Logging in...",
+    password:"Password",
+    passwordInput:"Enter your password",
+    login:"Sign In",
+    ok:"OK",
+    cancel:"Cancel",
     askch:"Ask about cybersecurity",
     chatbot:"The smart advisor",
     desnote:"No new notifications",
