@@ -121,7 +121,7 @@ export default function Chatbot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 max-h-[600px] bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden z-50">
+        <div className="fixed bottom-6 right-6 w-96 max-h-[600px] bg-[#000000] rounded-lg shadow-2xl flex flex-col overflow-hidden z-50">
           {/* Header */}
           <div className="bg-[#1B5E20] text-white px-6 py-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold">{t.chatbot}</h3>
@@ -142,7 +142,7 @@ export default function Chatbot() {
                   className={`max-w-xs px-4 py-3 rounded-lg ${
                     message.stl
                       ? "bg-[#1B5E20] text-white rounded-br-none"
-                      : "bg-gray-100 text-gray-800 rounded-bl-none"
+                      : "bg-gray-300 text-gray-800 rounded-bl-none"
                   }`}
                 >
                   <p className="text-sm">{message.input}</p>
@@ -172,7 +172,7 @@ export default function Chatbot() {
                 onChange={(e) => setText(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleText()}
                 placeholder="Type your question..."
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#1B5E20]"
+                className="flex-1 border border-gray-300 rounded-lg px-3 text-white py-2 text-sm focus:outline-none focus:border-[#1B5E20]"
               />
               <button
                 onClick={handleText}
